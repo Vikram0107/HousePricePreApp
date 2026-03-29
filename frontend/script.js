@@ -13,6 +13,13 @@ function switchTab(tabName) {
     document.getElementById(`${tabName}-tab`).classList.add('active');
     event.target.classList.add('active');
 
+    // Add this inside your switchTab function
+if (tabName === 'history') {
+    setTimeout(() => {
+        loadHistory();
+    }, 100);
+}
+
     if (tabName === 'analytics') {
         setTimeout(() => {
             loadStatistics();
@@ -789,3 +796,134 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Load prediction history
+async function loadHistory() {
+    try {
+        const response = await fetch('http://localhost:5000/api/history');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayHistory(data.history);
+            loadHistoryStats();
+        } else {
+            console.error('Error loading history:', data.error);
+        }
+    } catch (error) {
+        console.error('Error loading history:', error);
+        document.getElementById('history-table-body').innerHTML = 
+            '<tr><td colspan="6" class="error-text">Failed to load history. Make sure server is running.</td></tr>';
+    }
+}
+
+// Display history in table
+function displayHistory(history) {
+    const tbody = document.getElementById('history-table-body');
+    
+    if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-text">No predictions yet. Make a prediction to see it here!</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = history.map(item => `
+        <tr>
+            <td>${new Date(item.timestamp).toLocaleString()}</td>
+            <td class="price-cell">${item.formatted_price}</td>
+            <td>${item.formatted_lower} - ${item.formatted_upper}</td>
+            <td>
+                <div class="feature-badges">
+                    <span class="badge">🏠 ${item.input_features.GrLivArea || 0} sqft</span>
+                    <span class="badge">⭐ Q${item.input_features.OverallQual || 0}</span>
+                    <span class="badge">📅 ${item.input_features.YearBuilt || 0}</span>
+                    <span class="badge">📍 ${item.input_features.Neighborhood || 'Unknown'}</span>
+                </div>
+            </td>
+            <td class="${item.vs_average_percent.includes('-') ? 'negative' : 'positive'}">
+                ${item.vs_average_diff} (${item.vs_average_percent})
+            </td>
+            <td>
+                <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Load history statistics
+async function loadHistoryStats() {
+    try {
+        const response = await fetch('http://localhost:5000/api/history/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('total-predictions').textContent = data.total_predictions;
+            document.getElementById('avg-prediction').textContent = `$${data.avg_prediction.toLocaleString()}`;
+            document.getElementById('max-prediction').textContent = `$${data.max_prediction.toLocaleString()}`;
+            document.getElementById('min-prediction').textContent = `$${data.min_prediction.toLocaleString()}`;
+        }
+    } catch (error) {
+        console.error('Error loading history stats:', error);
+    }
+}
+
+// Delete a single prediction
+async function deletePrediction(id) {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/history/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                loadHistory(); // Refresh the history
+                showToast('Prediction deleted successfully!');
+            } else {
+                alert('Error deleting prediction: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error deleting prediction:', error);
+            alert('Failed to delete prediction');
+        }
+    }
+}
+
+// Clear all history
+async function clearHistory() {
+    if (confirm('⚠️ Are you sure you want to clear ALL prediction history? This action cannot be undone!')) {
+        try {
+            const response = await fetch('http://localhost:5000/api/history/clear', {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                loadHistory(); // Refresh the history
+                showToast('All history cleared successfully!');
+            } else {
+                alert('Error clearing history: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error clearing history:', error);
+            alert('Failed to clear history');
+        }
+    }
+}
+
+// Show toast notification
+function showToast(message) {
+    // Create toast element if it doesn't exist
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+

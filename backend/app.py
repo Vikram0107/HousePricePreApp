@@ -4,17 +4,51 @@ import joblib
 import numpy as np
 import pandas as pd
 import os
+import sqlite3
+import json
+from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 CORS(app)
 
+# Database setup
+DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'predictions.db')
+
+def init_database():
+    """Initialize SQLite database with predictions table"""
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS predictions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            predicted_price REAL NOT NULL,
+            formatted_price TEXT NOT NULL,
+            confidence_lower REAL NOT NULL,
+            confidence_upper REAL NOT NULL,
+            formatted_lower TEXT NOT NULL,
+            formatted_upper TEXT NOT NULL,
+            input_features TEXT NOT NULL,
+            vs_average_diff TEXT,
+            vs_average_percent TEXT
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+    print(f"✅ Database initialized at: {DATABASE_PATH}")
+
+# Call database initialization
+init_database()
+
 # Get the absolute paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)  # Go up to project root
+project_root = os.path.dirname(current_dir)
 
-# Model paths (looking for 'model' or 'models' folder)
+# Model paths
 model_folder = os.path.join(project_root, 'model')
 if not os.path.exists(model_folder):
     model_folder = os.path.join(project_root, 'models')
@@ -44,7 +78,6 @@ try:
 except Exception as e:
     print(f"❌ Error loading model: {e}")
     print(f"Please ensure model files exist in: {model_folder}")
-    exit(1)
 
 # Calculate statistics
 mean_price = train_df['SalePrice'].mean()
@@ -260,6 +293,95 @@ def get_boxplot_data():
         'feature': feature
     })
 
+@app.route('/api/history', methods=['GET'])
+def get_history():
+    """Get all prediction history from database"""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, timestamp, formatted_price, confidence_lower, confidence_upper,
+                   input_features, vs_average_diff, vs_average_percent
+            FROM predictions 
+            ORDER BY timestamp DESC
+            LIMIT 100
+        ''')
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        history = []
+        for row in rows:
+            history.append({
+                'id': row[0],
+                'timestamp': row[1],
+                'formatted_price': row[2],
+                'confidence_lower': row[3],
+                'confidence_upper': row[4],
+                'input_features': json.loads(row[5]),
+                'vs_average_diff': row[6],
+                'vs_average_percent': row[7]
+            })
+        
+        return jsonify({'success': True, 'history': history})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/history/clear', methods=['DELETE'])
+def clear_history():
+    """Clear all prediction history"""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM predictions')
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'History cleared successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/history/delete/<int:prediction_id>', methods=['DELETE'])
+def delete_prediction(prediction_id):
+    """Delete a single prediction from history"""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM predictions WHERE id = ?', (prediction_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Prediction deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/history/stats', methods=['GET'])
+def get_history_stats():
+    """Get statistics about prediction history"""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT COUNT(*) FROM predictions')
+        total_predictions = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT AVG(predicted_price) FROM predictions')
+        avg_prediction = cursor.fetchone()[0] or 0
+        
+        cursor.execute('SELECT MIN(predicted_price), MAX(predicted_price) FROM predictions')
+        min_max = cursor.fetchone()
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'total_predictions': total_predictions,
+            'avg_prediction': float(avg_prediction),
+            'min_prediction': float(min_max[0]) if min_max[0] else 0,
+            'max_prediction': float(min_max[1]) if min_max[1] else 0
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -303,21 +425,68 @@ def predict():
 
         confidence_lower = prediction * 0.9
         confidence_upper = prediction * 1.1
+        
+        formatted_price = f"${prediction:,.2f}"
+        formatted_lower = f"${confidence_lower:,.2f}"
+        formatted_upper = f"${confidence_upper:,.2f}"
+        
+        vs_average_diff = f"${prediction - mean_price:,.0f}"
+        vs_average_percent = f"{((prediction - mean_price) / mean_price * 100):.1f}%"
+        
+        # Save to database
+        try:
+            conn = sqlite3.connect(DATABASE_PATH)
+            cursor = conn.cursor()
+            
+            # Extract key features for storage (limit to important ones)
+            important_features = {
+                'GrLivArea': data.get('GrLivArea', 0),
+                'OverallQual': data.get('OverallQual', 0),
+                'YearBuilt': data.get('YearBuilt', 0),
+                'Neighborhood': data.get('Neighborhood', 'Unknown'),
+                'GarageCars': data.get('GarageCars', 0),
+                'TotalBsmtSF': data.get('TotalBsmtSF', 0),
+                'Fireplaces': data.get('Fireplaces', 0)
+            }
+            
+            cursor.execute('''
+                INSERT INTO predictions 
+                (timestamp, predicted_price, formatted_price, confidence_lower, confidence_upper,
+                 formatted_lower, formatted_upper, input_features, vs_average_diff, vs_average_percent)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                datetime.now().isoformat(),
+                float(prediction),
+                formatted_price,
+                float(confidence_lower),
+                float(confidence_upper),
+                formatted_lower,
+                formatted_upper,
+                json.dumps(important_features),
+                vs_average_diff,
+                vs_average_percent
+            ))
+            
+            conn.commit()
+            conn.close()
+            print("✅ Prediction saved to database")
+        except Exception as db_error:
+            print(f"⚠️ Database error: {db_error}")
 
         return jsonify({
             'success': True,
             'predicted_price': round(prediction, 2),
-            'formatted_price': f"${prediction:,.2f}",
+            'formatted_price': formatted_price,
             'confidence_range': {
                 'lower': round(confidence_lower, 2),
                 'upper': round(confidence_upper, 2),
-                'formatted_lower': f"${confidence_lower:,.2f}",
-                'formatted_upper': f"${confidence_upper:,.2f}"
+                'formatted_lower': formatted_lower,
+                'formatted_upper': formatted_upper
             },
             'vs_average': {
                 'avg_price': f"${mean_price:,.0f}",
-                'difference': f"${prediction - mean_price:,.0f}",
-                'percent_diff': f"{((prediction - mean_price) / mean_price * 100):.1f}%"
+                'difference': vs_average_diff,
+                'percent_diff': vs_average_percent
             }
         })
 

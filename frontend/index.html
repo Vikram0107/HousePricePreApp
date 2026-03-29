@@ -23,6 +23,7 @@
             <button class="tab-btn" onclick="switchTab('analytics')">📊 3D Analytics Dashboard</button>
             <button class="tab-btn" onclick="switchTab('correlation')">🔥 Correlation Analysis</button>
             <button class="tab-btn" onclick="switchTab('insights')">💡 Market Insights</button>
+            <button class="tab-btn" onclick="switchTab('history')">📜 History</button>
         </div>
 
         <!-- Tab 1: Price Predictor -->
@@ -35,12 +36,12 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GrLivArea">Living Area (sq ft):</label>
-                                <input type="number" id="GrLivArea" name="GrLivArea" required min="300" max="10000" value="1500">
+                                <input type="number" id="GrLivArea" name="GrLivArea" required min="0" max="10000" value="1500">
                                 <small>Above grade living area</small>
                             </div>
                             <div class="form-group">
                                 <label for="LotArea">Lot Area (sq ft):</label>
-                                <input type="number" id="LotArea" name="LotArea" required min="1000" max="200000" value="10000">
+                                <input type="number" id="LotArea" name="LotArea" required min="0" max="200000" value="10000">
                             </div>
                         </div>
 
@@ -51,7 +52,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="1stFlrSF">First Floor SF:</label>
-                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="300" max="10000" value="1000">
+                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="0" max="10000" value="1000">
                             </div>
                         </div>
 
@@ -404,6 +405,59 @@
                 </div>
             </div>
         </div>
+        <!-- Tab 5: History -->
+<div id="history-tab" class="tab-content">
+    <div class="history-dashboard">
+        <div class="history-header">
+            <h2>📜 Prediction History</h2>
+            <div class="history-actions">
+                <button class="btn-refresh" onclick="loadHistory()">🔄 Refresh</button>
+                <button class="btn-clear" onclick="clearHistory()">🗑️ Clear All</button>
+            </div>
+        </div>
+        
+        <!-- History Statistics -->
+        <div class="history-stats-grid">
+            <div class="stat-card">
+                <h4>Total Predictions</h4>
+                <div class="stat-number" id="total-predictions">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Average Prediction</h4>
+                <div class="stat-number" id="avg-prediction">$0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Highest Prediction</h4>
+                <div class="stat-number" id="max-prediction">$0</div>
+            </div>
+            <div class="stat-card">
+                <h4>Lowest Prediction</h4>
+                <div class="stat-number" id="min-prediction">$0</div>
+            </div>
+        </div>
+        
+        <!-- History Table -->
+        <div class="history-table-container">
+            <table class="history-table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Predicted Price</th>
+                        <th>Confidence Range</th>
+                        <th>Key Features</th>
+                        <th>vs Average</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    <tr>
+                        <td colspan="6" class="loading-text">Loading history...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         <footer>
             <p>Ames House Price Predictor | Ridge Regression | 2D & 3D Analytics Dashboard</p>
