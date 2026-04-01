@@ -17,12 +17,11 @@
             <p>Advanced 3D Analytics & Machine Learning Dashboard</p>
         </header>
 
-        <!-- Navigation Tabs -->
+        <!-- Navigation Tabs (Removed Market Insights) -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('predictor')">🏡 Price Predictor</button>
             <button class="tab-btn" onclick="switchTab('analytics')">📊 3D Analytics Dashboard</button>
             <button class="tab-btn" onclick="switchTab('correlation')">🔥 Correlation Analysis</button>
-            <button class="tab-btn" onclick="switchTab('insights')">💡 Market Insights</button>
             <button class="tab-btn" onclick="switchTab('history')">📜 History</button>
         </div>
 
@@ -36,12 +35,12 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GrLivArea">Living Area (sq ft):</label>
-                                <input type="number" id="GrLivArea" name="GrLivArea" required min="0" max="10000" value="1500">
+                                <input type="number" id="GrLivArea" name="GrLivArea" required min="300" max="10000" value="1500">
                                 <small>Above grade living area</small>
                             </div>
                             <div class="form-group">
                                 <label for="LotArea">Lot Area (sq ft):</label>
-                                <input type="number" id="LotArea" name="LotArea" required min="0" max="200000" value="10000">
+                                <input type="number" id="LotArea" name="LotArea" required min="1000" max="200000" value="10000">
                             </div>
                         </div>
 
@@ -52,7 +51,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="1stFlrSF">First Floor SF:</label>
-                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="0" max="10000" value="1000">
+                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="300" max="10000" value="1000">
                             </div>
                         </div>
 
@@ -206,7 +205,7 @@
             </main>
         </div>
 
-        <!-- Tab 2: 3D Analytics Dashboard (UPDATED: Only 2D and 3D Scatter Plots) -->
+        <!-- Tab 2: 3D Analytics Dashboard -->
         <div id="analytics-tab" class="tab-content">
             <div class="dashboard">
                 <!-- Key Metrics Cards -->
@@ -329,7 +328,7 @@
             </div>
         </div>
 
-        <!-- Tab 3: Correlation Analysis -->
+                <!-- Tab 3: Correlation Analysis (Improved) -->
         <div id="correlation-tab" class="tab-content">
             <div class="dashboard">
                 <div class="chart-card full-width">
@@ -354,14 +353,38 @@
                 </div>
 
                 <div class="charts-grid">
+                    <!-- Improved Price Distribution Chart -->
                     <div class="chart-card">
-                        <h3>📈 Price Distribution</h3>
-                        <canvas id="priceHistogram"></canvas>
+                        <h3>📈 Price Distribution Analysis</h3>
+                        <div class="distribution-controls">
+                            <button class="dist-btn active" onclick="changeDistributionView('histogram')">Histogram</button>
+                            <button class="dist-btn" onclick="changeDistributionView('density')">Density Plot</button>
+                            <button class="dist-btn" onclick="changeDistributionView('cumulative')">Cumulative</button>
+                        </div>
+                        <div id="priceDistributionContainer" style="height: 450px;"></div>
+                        <div class="distribution-stats" id="price-distribution-stats"></div>
                     </div>
 
+                    <!-- Improved Box Plot by Neighborhood -->
                     <div class="chart-card">
-                        <h3>📊 Box Plot by Neighborhood</h3>
+                        <h3>📊 Neighborhood Price Analysis</h3>
+                        <div class="boxplot-controls">
+                            <label>Sort by:</label>
+                            <select id="boxplotSortBy" onchange="updateBoxplot()">
+                                <option value="price">Median Price (High to Low)</option>
+                                <option value="name">Neighborhood Name</option>
+                                <option value="count">Number of Houses</option>
+                            </select>
+                            <label>Top N:</label>
+                            <select id="boxplotTopN" onchange="updateBoxplot()">
+                                <option value="8">Top 8</option>
+                                <option value="10" selected>Top 10</option>
+                                <option value="12">Top 12</option>
+                                <option value="15">Top 15</option>
+                            </select>
+                        </div>
                         <div id="boxplotChart" style="height: 500px;"></div>
+                        <div class="boxplot-insights" id="boxplot-insights"></div>
                     </div>
                 </div>
 
@@ -372,92 +395,59 @@
             </div>
         </div>
 
-        <!-- Tab 4: Market Insights -->
-        <div id="insights-tab" class="tab-content">
-            <div class="insights-dashboard">
-                <h2>🏘️ Market Insights & Investment Recommendations</h2>
-
-                <div class="insights-grid">
-                    <div class="insight-card">
-                        <h3>📍 Best Neighborhoods for Investment</h3>
-                        <div id="best-neighborhoods" class="insight-list"></div>
+        <!-- Tab 4: History -->
+        <div id="history-tab" class="tab-content">
+            <div class="history-dashboard">
+                <div class="history-header">
+                    <h2>📜 Prediction History</h2>
+                    <div class="history-actions">
+                        <button class="btn-refresh" onclick="loadHistory()">🔄 Refresh</button>
+                        <button class="btn-clear" onclick="clearHistory()">🗑️ Clear All</button>
                     </div>
-
-                    <div class="insight-card">
-                        <h3>💎 Most Valuable Features</h3>
-                        <div id="valuable-features" class="insight-list"></div>
+                </div>
+                
+                <!-- History Statistics -->
+                <div class="history-stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Predictions</h4>
+                        <div class="stat-number" id="total-predictions">0</div>
                     </div>
-
-                    <div class="insight-card">
-                        <h3>📈 Price Appreciation Factors</h3>
-                        <div id="appreciation-factors" class="insight-list"></div>
+                    <div class="stat-card">
+                        <h4>Average Prediction</h4>
+                        <div class="stat-number" id="avg-prediction">$0</div>
                     </div>
-
-                    <div class="insight-card">
-                        <h3>⚠️ Price Depreciation Factors</h3>
-                        <div id="depreciation-factors" class="insight-list"></div>
+                    <div class="stat-card">
+                        <h4>Highest Prediction</h4>
+                        <div class="stat-number" id="max-prediction">$0</div>
                     </div>
-
-                    <div class="insight-card full-width">
-                        <h3>💡 Investment Recommendations</h3>
-                        <div id="recommendations" class="recommendations-text"></div>
+                    <div class="stat-card">
+                        <h4>Lowest Prediction</h4>
+                        <div class="stat-number" id="min-prediction">$0</div>
                     </div>
+                </div>
+                
+                <!-- History Table -->
+                <div class="history-table-container">
+                    <table class="history-table" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Predicted Price</th>
+                                <th>Confidence Range</th>
+                                <th>Key Features</th>
+                                <th>vs Average</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="6" class="loading-text">Loading history...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <!-- Tab 5: History -->
-<div id="history-tab" class="tab-content">
-    <div class="history-dashboard">
-        <div class="history-header">
-            <h2>📜 Prediction History</h2>
-            <div class="history-actions">
-                <button class="btn-refresh" onclick="loadHistory()">🔄 Refresh</button>
-                <button class="btn-clear" onclick="clearHistory()">🗑️ Clear All</button>
-            </div>
-        </div>
-        
-        <!-- History Statistics -->
-        <div class="history-stats-grid">
-            <div class="stat-card">
-                <h4>Total Predictions</h4>
-                <div class="stat-number" id="total-predictions">0</div>
-            </div>
-            <div class="stat-card">
-                <h4>Average Prediction</h4>
-                <div class="stat-number" id="avg-prediction">$0</div>
-            </div>
-            <div class="stat-card">
-                <h4>Highest Prediction</h4>
-                <div class="stat-number" id="max-prediction">$0</div>
-            </div>
-            <div class="stat-card">
-                <h4>Lowest Prediction</h4>
-                <div class="stat-number" id="min-prediction">$0</div>
-            </div>
-        </div>
-        
-        <!-- History Table -->
-        <div class="history-table-container">
-            <table class="history-table" id="history-table">
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Predicted Price</th>
-                        <th>Confidence Range</th>
-                        <th>Key Features</th>
-                        <th>vs Average</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="history-table-body">
-                    <tr>
-                        <td colspan="6" class="loading-text">Loading history...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
         <footer>
             <p>Ames House Price Predictor | Ridge Regression | 2D & 3D Analytics Dashboard</p>

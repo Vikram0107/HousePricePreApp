@@ -874,3 +874,162 @@ canvas {
         font-size: 1.2em;
     }
 }
+/* Distribution Chart Controls */
+.distribution-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.dist-btn {
+    padding: 6px 15px;
+    background: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: #555;
+}
+
+.dist-btn:hover {
+    background: #e0e0e0;
+    transform: translateY(-1px);
+}
+
+.dist-btn.active {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    border-color: #2a5298;
+}
+
+/* Distribution Statistics */
+.distribution-stats {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.stat-box .stat-label {
+    display: block;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.stat-box .stat-value {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2a5298;
+}
+
+/* Boxplot Controls */
+.boxplot-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.boxplot-controls label {
+    font-weight: 600;
+    color: #555;
+    margin: 0;
+}
+
+.boxplot-controls select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    background: white;
+}
+
+/* Boxplot Insights */
+.boxplot-insights {
+    margin-top: 15px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+}
+
+.boxplot-insights-content h4 {
+    color: #2a5298;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.insights-grid-small {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.insight-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.insight-badge .emoji {
+    font-size: 18px;
+}
+
+.insight-badge strong {
+    color: #1e3c72;
+}
+
+.insight-note {
+    padding: 10px;
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #856404;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .insights-grid-small {
+        grid-template-columns: 1fr;
+    }
+    
+    .distribution-controls {
+        flex-wrap: wrap;
+    }
+    
+    .boxplot-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
