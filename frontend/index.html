@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -35,23 +37,27 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GrLivArea">Living Area (sq ft):</label>
-                                <input type="number" id="GrLivArea" name="GrLivArea" required min="300" max="10000" value="1500">
+                                <input type="number" id="GrLivArea" name="GrLivArea" required min="0" max="10000"
+                                    value="1500">
                                 <small>Above grade living area</small>
                             </div>
                             <div class="form-group">
                                 <label for="LotArea">Lot Area (sq ft):</label>
-                                <input type="number" id="LotArea" name="LotArea" required min="1000" max="200000" value="10000">
+                                <input type="number" id="LotArea" name="LotArea" required min="0" max="200000"
+                                    value="10000">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="TotalBsmtSF">Basement Area (sq ft):</label>
-                                <input type="number" id="TotalBsmtSF" name="TotalBsmtSF" required min="0" max="10000" value="800">
+                                <input type="number" id="TotalBsmtSF" name="TotalBsmtSF" required min="0" max="10000"
+                                    value="800">
                             </div>
                             <div class="form-group">
                                 <label for="1stFlrSF">First Floor SF:</label>
-                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="300" max="10000" value="1000">
+                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="0" max="10000"
+                                    value="1000">
                             </div>
                         </div>
 
@@ -59,22 +65,26 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="OverallQual">Overall Quality (1-10):</label>
-                                <input type="number" id="OverallQual" name="OverallQual" required min="1" max="10" value="7">
+                                <input type="number" id="OverallQual" name="OverallQual" required min="1" max="10"
+                                    value="7">
                             </div>
                             <div class="form-group">
                                 <label for="OverallCond">Overall Condition (1-10):</label>
-                                <input type="number" id="OverallCond" name="OverallCond" required min="1" max="10" value="5">
+                                <input type="number" id="OverallCond" name="OverallCond" required min="1" max="10"
+                                    value="5">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="YearBuilt">Year Built:</label>
-                                <input type="number" id="YearBuilt" name="YearBuilt" required min="1800" max="2025" value="2000">
+                                <input type="number" id="YearBuilt" name="YearBuilt" required min="1800" max="2025"
+                                    value="2000">
                             </div>
                             <div class="form-group">
                                 <label for="YearRemodAdd">Year Remodeled:</label>
-                                <input type="number" id="YearRemodAdd" name="YearRemodAdd" required min="1800" max="2025" value="2000">
+                                <input type="number" id="YearRemodAdd" name="YearRemodAdd" required min="1800"
+                                    max="2025" value="2000">
                             </div>
                         </div>
 
@@ -82,7 +92,8 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="BedroomAbvGr">Bedrooms:</label>
-                                <input type="number" id="BedroomAbvGr" name="BedroomAbvGr" required min="0" max="10" value="3">
+                                <input type="number" id="BedroomAbvGr" name="BedroomAbvGr" required min="0" max="10"
+                                    value="3">
                             </div>
                             <div class="form-group">
                                 <label for="FullBath">Full Bathrooms:</label>
@@ -97,7 +108,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="Fireplaces">Fireplaces:</label>
-                                <input type="number" id="Fireplaces" name="Fireplaces" required min="0" max="4" value="1">
+                                <input type="number" id="Fireplaces" name="Fireplaces" required min="0" max="4"
+                                    value="1">
                             </div>
                         </div>
 
@@ -105,11 +117,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GarageCars">Garage Capacity (cars):</label>
-                                <input type="number" id="GarageCars" name="GarageCars" required min="0" max="5" value="2">
+                                <input type="number" id="GarageCars" name="GarageCars" required min="0" max="5"
+                                    value="2">
                             </div>
                             <div class="form-group">
                                 <label for="GarageArea">Garage Area (sq ft):</label>
-                                <input type="number" id="GarageArea" name="GarageArea" required min="0" max="2000" value="500">
+                                <input type="number" id="GarageArea" name="GarageArea" required min="0" max="2000"
+                                    value="500">
                             </div>
                         </div>
 
@@ -145,11 +159,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="WoodDeckSF">Wood Deck Area (sq ft):</label>
-                                <input type="number" id="WoodDeckSF" name="WoodDeckSF" required min="0" max="1000" value="100">
+                                <input type="number" id="WoodDeckSF" name="WoodDeckSF" required min="0" max="1000"
+                                    value="100">
                             </div>
                             <div class="form-group">
                                 <label for="OpenPorchSF">Open Porch Area (sq ft):</label>
-                                <input type="number" id="OpenPorchSF" name="OpenPorchSF" required min="0" max="1000" value="50">
+                                <input type="number" id="OpenPorchSF" name="OpenPorchSF" required min="0" max="1000"
+                                    value="50">
                             </div>
                         </div>
 
@@ -328,7 +344,7 @@
             </div>
         </div>
 
-                <!-- Tab 3: Correlation Analysis (Improved) -->
+        <!-- Tab 3: Correlation Analysis (Improved) -->
         <div id="correlation-tab" class="tab-content">
             <div class="dashboard">
                 <div class="chart-card full-width">
@@ -357,7 +373,8 @@
                     <div class="chart-card">
                         <h3>📈 Price Distribution Analysis</h3>
                         <div class="distribution-controls">
-                            <button class="dist-btn active" onclick="changeDistributionView('histogram')">Histogram</button>
+                            <button class="dist-btn active"
+                                onclick="changeDistributionView('histogram')">Histogram</button>
                             <button class="dist-btn" onclick="changeDistributionView('density')">Density Plot</button>
                             <button class="dist-btn" onclick="changeDistributionView('cumulative')">Cumulative</button>
                         </div>
@@ -405,7 +422,7 @@
                         <button class="btn-clear" onclick="clearHistory()">🗑️ Clear All</button>
                     </div>
                 </div>
-                
+
                 <!-- History Statistics -->
                 <div class="history-stats-grid">
                     <div class="stat-card">
@@ -425,7 +442,7 @@
                         <div class="stat-number" id="min-prediction">$0</div>
                     </div>
                 </div>
-                
+
                 <!-- History Table -->
                 <div class="history-table-container">
                     <table class="history-table" id="history-table">
@@ -455,5 +472,33 @@
     </div>
 
     <script src="script.js"></script>
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeFeedbackModal()">&times;</span>
+            <h3>📝 Provide Feedback</h3>
+            <p>Did you actually sell this house? Help us improve our model!</p>
+
+            <div class="form-group">
+                <label>Actual Sale Price ($):</label>
+                <input type="number" id="actualPrice" placeholder="Enter actual sale price">
+            </div>
+
+            <div class="form-group">
+                <label>Rate your experience:</label>
+                <div class="rating-stars">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+            </div>
+
+            <button class="btn-submit-feedback" onclick="submitFeedback()">Submit Feedback</button>
+            <p class="feedback-note">Your feedback will help us improve prediction accuracy!</p>
+        </div>
+    </div>
 </body>
+
 </html>
