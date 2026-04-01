@@ -34,7 +34,7 @@ header p {
     opacity: 0.9;
 }
 
-/* Tabs */
+/* ==================== TABS ==================== */
 .tabs {
     display: flex;
     gap: 10px;
@@ -79,14 +79,13 @@ header p {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Main Layout */
+/* ==================== PREDICTOR TAB ==================== */
 main {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -208,7 +207,6 @@ small {
         opacity: 0;
         transform: translateY(-20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -234,15 +232,8 @@ small {
 }
 
 @keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 .price-range {
@@ -285,19 +276,9 @@ small {
 }
 
 @keyframes shake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-5px);
-    }
-
-    75% {
-        transform: translateX(5px);
-    }
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
 .info-card h4 {
@@ -358,37 +339,7 @@ small {
     line-height: 1.5;
 }
 
-footer {
-    text-align: center;
-    color: white;
-    margin-top: 40px;
-    padding: 20px;
-    opacity: 0.8;
-}
-
-/* Loading animation */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #2a5298;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 10px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Dashboard Styles */
+/* ==================== DASHBOARD & CHARTS ==================== */
 .dashboard {
     padding: 20px;
 }
@@ -426,7 +377,6 @@ footer {
     margin: 10px 0;
 }
 
-/* Chart Controls */
 .chart-controls {
     background: white;
     padding: 20px;
@@ -467,7 +417,6 @@ footer {
     flex-wrap: wrap;
 }
 
-/* Charts Grid */
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -492,7 +441,18 @@ footer {
     grid-column: 1 / -1;
 }
 
-/* Heatmap Controls */
+canvas {
+    max-height: 400px;
+    width: 100% !important;
+}
+
+#plotlyChart {
+    background: white;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+/* ==================== HEATMAP & CORRELATION ==================== */
 .heatmap-controls {
     background: #f8f9fa;
     padding: 15px;
@@ -517,7 +477,6 @@ footer {
     width: auto;
 }
 
-/* Correlation Table */
 .correlation-table {
     overflow-x: auto;
     margin-top: 20px;
@@ -560,151 +519,146 @@ footer {
     background-color: #6bcf7f !important;
 }
 
-/* Insights Dashboard */
-.insights-dashboard {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-}
-
-.insights-dashboard h2 {
-    color: #2a5298;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.insights-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-}
-
-.insight-card {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 20px;
-    border-left: 4px solid #2a5298;
-}
-
-.insight-card h3 {
-    color: #2a5298;
-    margin-bottom: 15px;
-}
-
-.insight-card.full-width {
-    grid-column: 1 / -1;
-}
-
-.insight-list {
+/* ==================== DISTRIBUTION CHARTS ==================== */
+.distribution-controls {
     display: flex;
-    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.dist-btn {
+    padding: 6px 15px;
+    background: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: #555;
+}
+
+.dist-btn:hover {
+    background: #e0e0e0;
+    transform: translateY(-1px);
+}
+
+.dist-btn.active {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    border-color: #2a5298;
+}
+
+.distribution-stats {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px;
 }
 
-.insight-item {
-    padding: 10px;
+.stat-box {
+    text-align: center;
+    padding: 8px;
     background: white;
     border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box .stat-label {
+    display: block;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.stat-box .stat-value {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2a5298;
+}
+
+/* ==================== BOXPLOT ==================== */
+.boxplot-controls {
     display: flex;
-    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
 }
 
-.badge {
-    background: #27ae60;
-    color: white;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.85em;
+.boxplot-controls label {
+    font-weight: 600;
+    color: #555;
+    margin: 0;
 }
 
-.recommendations-text {
-    line-height: 1.8;
-}
-
-.recommendations-text ul {
-    margin: 15px 0;
-    padding-left: 20px;
-}
-
-.recommendations-text li {
-    margin: 8px 0;
-}
-
-canvas {
-    max-height: 400px;
-    width: 100% !important;
-}
-
-#plotlyChart {
+.boxplot-controls select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    cursor: pointer;
     background: white;
+}
+
+.boxplot-insights {
+    margin-top: 15px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 10px;
-    margin-top: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    main {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    header h1 {
-        font-size: 2.2em;
-    }
-
-    .price {
-        font-size: 3.5em;
-    }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
+.boxplot-insights-content h4 {
+    color: #2a5298;
+    margin-bottom: 12px;
+    font-size: 14px;
 }
 
-@media (max-width: 768px) {
-    .chart-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .control-group {
-        justify-content: space-between;
-    }
-
-    .control-group select {
-        width: 60%;
-    }
-
-    .axis-controls {
-        flex-direction: column;
-    }
-
-    .heatmap-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .data-table {
-        font-size: 10px;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 4px;
-    }
-
-    .metric-value {
-        font-size: 1.8em;
-    }
+.insights-grid-small {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
-/* History Tab Styles */
+.insight-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.insight-badge .emoji {
+    font-size: 18px;
+}
+
+.insight-badge strong {
+    color: #1e3c72;
+}
+
+.insight-note {
+    padding: 10px;
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #856404;
+}
+
+/* ==================== HISTORY TAB ==================== */
 .history-dashboard {
     background: white;
     border-radius: 15px;
@@ -872,214 +826,7 @@ canvas {
     color: #dc3545;
 }
 
-/* Toast Notification */
-.toast-notification {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #333;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    z-index: 1000;
-    opacity: 0;
-    transform: translateY(100px);
-    transition: all 0.3s ease;
-}
-
-.toast-notification.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-@media (max-width: 768px) {
-    .history-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .history-actions {
-        justify-content: stretch;
-    }
-
-    .history-table {
-        font-size: 11px;
-    }
-
-    .history-table th,
-    .history-table td {
-        padding: 8px;
-    }
-
-    .feature-badges .badge {
-        font-size: 9px;
-    }
-
-    .stat-number {
-        font-size: 1.2em;
-    }
-}
-
-/* Distribution Chart Controls */
-.distribution-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    justify-content: center;
-}
-
-.dist-btn {
-    padding: 6px 15px;
-    background: #f0f2f5;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    color: #555;
-}
-
-.dist-btn:hover {
-    background: #e0e0e0;
-    transform: translateY(-1px);
-}
-
-.dist-btn.active {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: white;
-    border-color: #2a5298;
-}
-
-/* Distribution Statistics */
-.distribution-stats {
-    margin-top: 15px;
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 10px;
-}
-
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-}
-
-.stat-box {
-    text-align: center;
-    padding: 8px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.stat-box .stat-label {
-    display: block;
-    font-size: 11px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.stat-box .stat-value {
-    display: block;
-    font-size: 14px;
-    font-weight: bold;
-    color: #2a5298;
-}
-
-/* Boxplot Controls */
-.boxplot-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.boxplot-controls label {
-    font-weight: 600;
-    color: #555;
-    margin: 0;
-}
-
-.boxplot-controls select {
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    background: white;
-}
-
-/* Boxplot Insights */
-.boxplot-insights {
-    margin-top: 15px;
-    padding: 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 10px;
-}
-
-.boxplot-insights-content h4 {
-    color: #2a5298;
-    margin-bottom: 12px;
-    font-size: 14px;
-}
-
-.insights-grid-small {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.insight-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: white;
-    border-radius: 8px;
-    font-size: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.insight-badge .emoji {
-    font-size: 18px;
-}
-
-.insight-badge strong {
-    color: #1e3c72;
-}
-
-.insight-note {
-    padding: 10px;
-    background: #fff3cd;
-    border-left: 3px solid #ffc107;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #856404;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .insights-grid-small {
-        grid-template-columns: 1fr;
-    }
-
-    .distribution-controls {
-        flex-wrap: wrap;
-    }
-
-    .boxplot-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
+/* ==================== FEEDBACK MODAL ==================== */
 .modal {
     position: fixed;
     top: 0;
@@ -1167,4 +914,855 @@ canvas {
     color: #666;
     margin-top: 10px;
     text-align: center;
+}
+
+/* ==================== HOME PAGE ==================== */
+.home-container {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 50px 40px;
+    color: white;
+    text-align: center;
+}
+
+.hero-content h2 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.hero-subtitle {
+    font-size: 1.2em;
+    opacity: 0.9;
+    margin-bottom: 15px;
+}
+
+.hero-description {
+    font-size: 1em;
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero-btn.primary {
+    background: white;
+    color: #667eea;
+}
+
+.hero-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-btn.secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.hero-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.stat-card-home {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card-home:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.stat-card-home .stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.stat-card-home .stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* Features Section */
+.features-section {
+    padding: 50px 40px;
+    background: #f8f9fa;
+}
+
+.features-section h3 {
+    text-align: center;
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.feature-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.feature-card h4 {
+    color: #2a5298;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.feature-card p {
+    color: #666;
+    line-height: 1.5;
+    font-size: 0.9em;
+}
+
+/* Quick Predict Section */
+.quick-predict-section {
+    padding: 50px 40px;
+    background: white;
+    text-align: center;
+}
+
+.quick-predict-section h3 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.quick-predict-section > p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.quick-predict-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.quick-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 30px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.quick-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.quick-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.quick-card h4 {
+    color: #2a5298;
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+
+.quick-card p {
+    color: #555;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.quick-badge {
+    display: inline-block;
+    background: #2a5298;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+}
+
+.quick-card:hover .quick-badge {
+    background: #1e3c72;
+    transform: scale(1.05);
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 50px 40px;
+    background: #f8f9fa;
+}
+
+.how-it-works h3 {
+    text-align: center;
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.step {
+    text-align: center;
+    padding: 20px;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0 auto 20px;
+}
+
+.step h4 {
+    color: #2a5298;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.step p {
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* ==================== ABOUT PAGE ==================== */
+.about-container {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.about-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 50px 40px;
+    text-align: center;
+    color: white;
+}
+
+.about-header h2 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.about-header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.about-content {
+    padding: 40px;
+}
+
+.about-section {
+    margin-bottom: 40px;
+}
+
+.about-section h3 {
+    color: #2a5298;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #667eea;
+    display: inline-block;
+}
+
+.about-section p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.about-section ul {
+    padding-left: 20px;
+    margin: 15px 0;
+}
+
+.about-section li {
+    color: #555;
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.about-section li strong {
+    color: #2a5298;
+}
+
+/* Model Details */
+.model-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.model-detail-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.model-detail-card:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.model-detail-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.model-detail-value {
+    color: #2a5298;
+    font-weight: bold;
+}
+
+/* Top Drivers */
+.top-drivers {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.driver-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.driver-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.driver-rank {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.driver-info {
+    flex: 1;
+}
+
+.driver-info strong {
+    color: #2a5298;
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.driver-info p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* Tech Stack */
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.tech-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.tech-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* About Footer */
+.about-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.about-footer p {
+    margin: 5px 0;
+}
+
+/* ==================== LOADING & TOAST ==================== */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #2a5298;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 0.3s ease;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== UTILITY ==================== */
+footer {
+    text-align: center;
+    color: white;
+    margin-top: 40px;
+    padding: 20px;
+    opacity: 0.8;
+}
+
+#priceDistributionContainer,
+#boxplotChart {
+    min-height: 400px;
+    width: 100%;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1024px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 2.2em;
+    }
+
+    .price {
+        font-size: 3.5em;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .control-group {
+        justify-content: space-between;
+    }
+
+    .control-group select {
+        width: 60%;
+    }
+
+    .axis-controls {
+        flex-direction: column;
+    }
+
+    .heatmap-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .data-table {
+        font-size: 10px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 4px;
+    }
+
+    .metric-value {
+        font-size: 1.8em;
+    }
+
+    .history-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .history-actions {
+        justify-content: stretch;
+    }
+
+    .history-table {
+        font-size: 11px;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 8px;
+    }
+
+    .feature-badges .badge {
+        font-size: 9px;
+    }
+
+    .stat-number {
+        font-size: 1.2em;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .insights-grid-small {
+        grid-template-columns: 1fr;
+    }
+
+    .distribution-controls {
+        flex-wrap: wrap;
+    }
+
+    .boxplot-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-section {
+        padding: 30px 20px;
+    }
+
+    .hero-content h2 {
+        font-size: 1.8em;
+    }
+
+    .features-section,
+    .quick-predict-section,
+    .how-it-works {
+        padding: 30px 20px;
+    }
+
+    .about-content {
+        padding: 20px;
+    }
+
+    .about-header {
+        padding: 30px 20px;
+    }
+
+    .about-header h2 {
+        font-size: 1.8em;
+    }
+
+    .model-detail-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .driver-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* ==================== CHART CONTAINER SPACING FIXES ==================== */
+
+/* Fix spacing below scatter plot in 3D Analytics tab */
+.chart-card.full-width {
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+#plotlyChart {
+    background: white;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    min-height: 600px;
+}
+
+/* Fix spacing in charts grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+    margin-top: 25px;
+}
+
+/* Individual chart card spacing */
+.chart-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+}
+
+.chart-card h3 {
+    color: #2a5298;
+    margin-bottom: 15px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+/* Fix spacing below correlation heatmap */
+#correlationHeatmap {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+    min-height: 800px;
+}
+
+/* Dashboard container spacing */
+.dashboard {
+    padding: 20px;
+}
+
+/* Metrics grid spacing */
+.metrics-grid {
+    margin-bottom: 30px;
+}
+
+/* Chart controls spacing */
+.chart-controls {
+    margin-bottom: 25px;
+}
+
+/* Heatmap controls spacing */
+.heatmap-controls {
+    margin-bottom: 20px;
+}
+
+/* Ensure proper spacing after charts */
+.chart-card.full-width:last-child {
+    margin-bottom: 0;
+}
+
+/* Fix for correlation table spacing */
+.correlation-table {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Boxplot container spacing */
+#boxplotChart {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Distribution container spacing */
+#priceDistributionContainer {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Distribution controls spacing */
+.distribution-controls {
+    margin-bottom: 15px;
+}
+
+/* Boxplot controls spacing */
+.boxplot-controls {
+    margin-bottom: 15px;
+}
+
+/* Boxplot insights spacing */
+.boxplot-insights {
+    margin-top: 15px;
+}
+
+/* Responsive fixes for smaller screens */
+@media (max-width: 768px) {
+    .charts-grid {
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .chart-card {
+        padding: 15px;
+    }
+    
+    #plotlyChart {
+        min-height: 400px;
+    }
+    
+    #correlationHeatmap {
+        min-height: 500px;
+    }
+    
+    .dashboard {
+        padding: 10px;
+    }
+    
+    .metrics-grid {
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+}
+/* ==================== IMPROVED CARD HOVER EFFECTS ==================== */
+
+/* Add smooth transition to chart cards */
+.chart-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Metric cards hover effect */
+.metric-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Add a subtle border to charts */
+#plotlyChart, 
+#correlationHeatmap,
+#priceDistributionContainer,
+#boxplotChart {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+/* Add spacing between elements in chart controls */
+.chart-controls .control-group {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 40px;
+}
+
+/* Heatmap controls styling */
+.heatmap-controls {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 15px 20px;
+}
+
+/* Distribution controls styling */
+.distribution-controls {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 40px;
+}
+
+/* Boxplot controls styling */
+.boxplot-controls {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 12px;
 }
