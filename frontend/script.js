@@ -1,4 +1,4 @@
-// Global variables
+// Global variables // From varshil09
 let charts = {};
 let plotlyChart = null;
 
@@ -67,7 +67,7 @@ function changeChartType() {
 // Main chart update function
 async function updateChart() {
     const chartType = document.getElementById('chartType').value;
-    
+
     if (chartType === '2d') {
         await render2DScatter();
     } else {
@@ -802,7 +802,7 @@ async function loadHistory() {
     try {
         const response = await fetch('http://localhost:5000/api/history');
         const data = await response.json();
-        
+
         if (data.success) {
             displayHistory(data.history);
             loadHistoryStats();
@@ -811,7 +811,7 @@ async function loadHistory() {
         }
     } catch (error) {
         console.error('Error loading history:', error);
-        document.getElementById('history-table-body').innerHTML = 
+        document.getElementById('history-table-body').innerHTML =
             '<tr><td colspan="6" class="error-text">Failed to load history. Make sure server is running.</td></tr>';
     }
 }
@@ -819,16 +819,16 @@ async function loadHistory() {
 // Display history in table
 function displayHistory(history) {
     const tbody = document.getElementById('history-table-body');
-    
+
     if (history.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="empty-text">No predictions yet. Make a prediction to see it here!</td></tr>';
         return;
     }
-    
+
     tbody.innerHTML = history.map(item => {
         // Debug: log the item to see what's available
         console.log('History item:', item);
-        
+
         // Get confidence range values - handle both possible formats
         let confidenceDisplay = 'N/A';
         if (item.formatted_lower && item.formatted_upper) {
@@ -836,7 +836,7 @@ function displayHistory(history) {
         } else if (item.confidence_lower && item.confidence_upper) {
             confidenceDisplay = `$${item.confidence_lower.toLocaleString()} - $${item.confidence_upper.toLocaleString()}`;
         }
-        
+
         return `
             <tr>
                 <td>${new Date(item.timestamp).toLocaleString()}</td>
@@ -865,7 +865,7 @@ async function loadHistoryStats() {
     try {
         const response = await fetch('http://localhost:5000/api/history/stats');
         const data = await response.json();
-        
+
         if (data.success) {
             document.getElementById('total-predictions').textContent = data.total_predictions;
             document.getElementById('avg-prediction').textContent = `$${data.avg_prediction.toLocaleString()}`;
@@ -885,7 +885,7 @@ async function deletePrediction(id) {
                 method: 'DELETE'
             });
             const data = await response.json();
-            
+
             if (data.success) {
                 loadHistory(); // Refresh the history
                 showToast('Prediction deleted successfully!');
@@ -907,7 +907,7 @@ async function clearHistory() {
                 method: 'DELETE'
             });
             const data = await response.json();
-            
+
             if (data.success) {
                 loadHistory(); // Refresh the history
                 showToast('All history cleared successfully!');
@@ -930,12 +930,11 @@ function showToast(message) {
         toast.className = 'toast-notification';
         document.body.appendChild(toast);
     }
-    
+
     toast.textContent = message;
     toast.classList.add('show');
-    
+
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
 }
-
