@@ -825,29 +825,41 @@ function displayHistory(history) {
         return;
     }
     
-    tbody.innerHTML = history.map(item => `
-        <tr>
-            <td>${new Date(item.timestamp).toLocaleString()}</td>
-            <td class="price-cell">${item.formatted_price}</td>
-            <td>${item.formatted_lower} - ${item.formatted_upper}</td>
-            <td>
-                <div class="feature-badges">
-                    <span class="badge">🏠 ${item.input_features.GrLivArea || 0} sqft</span>
-                    <span class="badge">⭐ Q${item.input_features.OverallQual || 0}</span>
-                    <span class="badge">📅 ${item.input_features.YearBuilt || 0}</span>
-                    <span class="badge">📍 ${item.input_features.Neighborhood || 'Unknown'}</span>
-                </div>
-            </td>
-            <td class="${item.vs_average_percent.includes('-') ? 'negative' : 'positive'}">
-                ${item.vs_average_diff} (${item.vs_average_percent})
-            </td>
-            <td>
-                <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = history.map(item => {
+        // Debug: log the item to see what's available
+        console.log('History item:', item);
+        
+        // Get confidence range values - handle both possible formats
+        let confidenceDisplay = 'N/A';
+        if (item.formatted_lower && item.formatted_upper) {
+            confidenceDisplay = `${item.formatted_lower} - ${item.formatted_upper}`;
+        } else if (item.confidence_lower && item.confidence_upper) {
+            confidenceDisplay = `$${item.confidence_lower.toLocaleString()} - $${item.confidence_upper.toLocaleString()}`;
+        }
+        
+        return `
+            <tr>
+                <td>${new Date(item.timestamp).toLocaleString()}</td>
+                <td class="price-cell">${item.formatted_price || `$${item.predicted_price?.toLocaleString()}`}</td>
+                <td>${confidenceDisplay}</td>
+                <td>
+                    <div class="feature-badges">
+                        <span class="badge">🏠 ${item.input_features?.GrLivArea || 0} sqft</span>
+                        <span class="badge">⭐ Q${item.input_features?.OverallQual || 0}</span>
+                        <span class="badge">📅 ${item.input_features?.YearBuilt || 0}</span>
+                        <span class="badge">📍 ${item.input_features?.Neighborhood || 'Unknown'}</span>
+                    </div>
+                </td>
+                <td class="${item.vs_average_percent?.includes('-') ? 'negative' : 'positive'}">
+                    ${item.vs_average_diff || 'N/A'} (${item.vs_average_percent || 'N/A'})
+                </td>
+                <td>
+                    <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
-
 // Load history statistics
 async function loadHistoryStats() {
     try {

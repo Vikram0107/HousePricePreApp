@@ -300,8 +300,11 @@ def get_history():
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         
+        # FIXED: Added formatted_lower and formatted_upper to SELECT query
         cursor.execute('''
-            SELECT id, timestamp, formatted_price, confidence_lower, confidence_upper,
+            SELECT id, timestamp, formatted_price, predicted_price,
+                   confidence_lower, confidence_upper, 
+                   formatted_lower, formatted_upper,
                    input_features, vs_average_diff, vs_average_percent
             FROM predictions 
             ORDER BY timestamp DESC
@@ -317,11 +320,14 @@ def get_history():
                 'id': row[0],
                 'timestamp': row[1],
                 'formatted_price': row[2],
-                'confidence_lower': row[3],
-                'confidence_upper': row[4],
-                'input_features': json.loads(row[5]),
-                'vs_average_diff': row[6],
-                'vs_average_percent': row[7]
+                'predicted_price': row[3],
+                'confidence_lower': row[4],
+                'confidence_upper': row[5],
+                'formatted_lower': row[6],      # Added
+                'formatted_upper': row[7],      # Added
+                'input_features': json.loads(row[8]),
+                'vs_average_diff': row[9],
+                'vs_average_percent': row[10]
             })
         
         return jsonify({'success': True, 'history': history})
