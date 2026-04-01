@@ -544,13 +544,13 @@ async function loadCorrelationTable() {
 // Change distribution view type
 function changeDistributionView(view) {
     currentDistributionView = view;
-    
+
     // Update active button styling
     document.querySelectorAll('.dist-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
-    
+
     loadPriceDistribution();
 }
 
@@ -559,40 +559,40 @@ async function loadPriceDistribution() {
     try {
         const response = await fetch('http://localhost:5000/api/price-distribution');
         const data = await response.json();
-        
+
         const prices = data.prices;
-        
+
         // Calculate statistics
         const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
         const median = [...prices].sort((a, b) => a - b)[Math.floor(prices.length / 2)];
         const stdDev = Math.sqrt(prices.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / prices.length);
-        
+
         // Create histogram bins
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
         const binCount = 30;
         const binWidth = (maxPrice - minPrice) / binCount;
-        
+
         const bins = Array(binCount).fill(0);
         const binEdges = [];
-        
+
         for (let i = 0; i <= binCount; i++) {
             binEdges.push(minPrice + i * binWidth);
         }
-        
+
         prices.forEach(price => {
             const binIndex = Math.min(Math.floor((price - minPrice) / binWidth), binCount - 1);
             bins[binIndex]++;
         });
-        
+
         const binCenters = [];
         for (let i = 0; i < binCount; i++) {
             binCenters.push(minPrice + (i + 0.5) * binWidth);
         }
-        
+
         // Create trace based on view type
         let trace;
-        
+
         if (currentDistributionView === 'histogram') {
             trace = {
                 x: binCenters,
@@ -612,7 +612,7 @@ async function loadPriceDistribution() {
             // Calculate density
             const total = prices.length;
             const density = bins.map(count => (count / total) / binWidth * 1000000);
-            
+
             trace = {
                 x: binCenters,
                 y: density,
@@ -636,7 +636,7 @@ async function loadPriceDistribution() {
                 const countBelow = prices.filter(p => p <= threshold).length;
                 cumulative.push((countBelow / total) * 100);
             }
-            
+
             trace = {
                 x: binEdges,
                 y: cumulative,
@@ -656,12 +656,12 @@ async function loadPriceDistribution() {
                 hovertemplate: 'Price: $%{x:,.0f}<br>Cumulative: %{y:.1f}%<extra></extra>'
             };
         }
-        
+
         const layout = {
             title: {
                 text: currentDistributionView === 'histogram' ? 'House Price Distribution' :
-                       currentDistributionView === 'density' ? 'Price Density Distribution' :
-                       'Cumulative Price Distribution',
+                    currentDistributionView === 'density' ? 'Price Density Distribution' :
+                        'Cumulative Price Distribution',
                 font: { size: 14, family: 'Segoe UI' }
             },
             xaxis: {
@@ -672,8 +672,8 @@ async function loadPriceDistribution() {
             },
             yaxis: {
                 title: currentDistributionView === 'histogram' ? 'Number of Houses' :
-                       currentDistributionView === 'density' ? 'Density (per million $)' :
-                       'Cumulative Percentage (%)',
+                    currentDistributionView === 'density' ? 'Density (per million $)' :
+                        'Cumulative Percentage (%)',
                 gridcolor: '#e0e0e0',
                 zerolinecolor: '#cccccc'
             },
@@ -684,7 +684,7 @@ async function loadPriceDistribution() {
             bargap: 0.05,
             showlegend: false
         };
-        
+
         // Add vertical line for mean and median for histogram and density
         if (currentDistributionView === 'histogram' || currentDistributionView === 'density') {
             const shapes = [
@@ -711,9 +711,9 @@ async function loadPriceDistribution() {
             ];
             layout.shapes = shapes;
         }
-        
+
         Plotly.newPlot('priceDistributionContainer', [trace], layout);
-        
+
         // Update statistics display
         const skewness = ((mean - median) / stdDev).toFixed(2);
         const statsHtml = `
@@ -745,7 +745,7 @@ async function loadPriceDistribution() {
             </div>
         `;
         document.getElementById('price-distribution-stats').innerHTML = statsHtml;
-        
+
     } catch (error) {
         console.error('Error loading price distribution:', error);
     }
@@ -756,10 +756,10 @@ async function updateBoxplot() {
     try {
         const sortBy = document.getElementById('boxplotSortBy').value;
         const topN = parseInt(document.getElementById('boxplotTopN').value);
-        
+
         const response = await fetch('http://localhost:5000/api/boxplot-data?feature=Neighborhood');
         const data = await response.json();
-        
+
         // Create data array for sorting
         let neighborhoods = [];
         for (let i = 0; i < data.categories.length; i++) {
@@ -770,7 +770,7 @@ async function updateBoxplot() {
             const max = Math.max(...prices);
             const q1 = prices[Math.floor(prices.length * 0.25)];
             const q3 = prices[Math.floor(prices.length * 0.75)];
-            
+
             neighborhoods.push({
                 name: data.categories[i],
                 prices: data.data[i],
@@ -783,7 +783,7 @@ async function updateBoxplot() {
                 count: prices.length
             });
         }
-        
+
         // Sort based on selection
         if (sortBy === 'price') {
             neighborhoods.sort((a, b) => b.median - a.median);
@@ -792,10 +792,10 @@ async function updateBoxplot() {
         } else if (sortBy === 'count') {
             neighborhoods.sort((a, b) => b.count - a.count);
         }
-        
+
         // Take top N
         const topNeighborhoods = neighborhoods.slice(0, topN);
-        
+
         // Prepare data for Plotly
         const traces = [];
         const colors = [
@@ -806,7 +806,7 @@ async function updateBoxplot() {
             'rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)',
             'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)'
         ];
-        
+
         topNeighborhoods.forEach((hood, idx) => {
             const trace = {
                 y: hood.prices,
@@ -823,7 +823,7 @@ async function updateBoxplot() {
             };
             traces.push(trace);
         });
-        
+
         const layout = {
             title: {
                 text: 'Price Distribution by Neighborhood',
@@ -847,15 +847,15 @@ async function updateBoxplot() {
             showlegend: false,
             hovermode: 'closest'
         };
-        
+
         Plotly.newPlot('boxplotChart', traces, layout);
-        
+
         // Generate insights
         const bestNeighborhood = topNeighborhoods[0];
         const worstNeighborhood = topNeighborhoods[topNeighborhoods.length - 1];
         const priceGap = ((bestNeighborhood.median - worstNeighborhood.median) / worstNeighborhood.median * 100).toFixed(0);
         const mostHouses = topNeighborhoods.reduce((max, h) => h.count > max.count ? h : max, topNeighborhoods[0]);
-        
+
         const insightsHtml = `
             <div class="boxplot-insights-content">
                 <h4>📊 Key Insights</h4>
@@ -887,9 +887,9 @@ async function updateBoxplot() {
                 </div>
             </div>
         `;
-        
+
         document.getElementById('boxplot-insights').innerHTML = insightsHtml;
-        
+
     } catch (error) {
         console.error('Error updating boxplot:', error);
     }
@@ -951,6 +951,14 @@ function displayHistory(history) {
                 <td class="${item.vs_average_percent?.includes('-') ? 'negative' : 'positive'}">
                     ${item.vs_average_diff || 'N/A'} (${item.vs_average_percent || 'N/A'})
                 </td>
+
+                <td class="feedback-cell">
+                    ${item.is_verified ?
+                '<span class="verified-badge">✓ Verified</span>' :
+                `<button class="btn-feedback" onclick="showFeedbackModal(${item.id})">📝 Add Actual Price</button>`
+            }
+                </td>
+
                 <td>
                     <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
                 </td>
@@ -1040,7 +1048,7 @@ function showToast(message) {
 }
 
 // Prediction form handling
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('predictionForm');
     const resultDiv = document.getElementById('result');
     const errorDiv = document.getElementById('error');
@@ -1049,7 +1057,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorMessageSpan = document.getElementById('errorMessage');
     const predictBtn = document.querySelector('.predict-btn');
 
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         resultDiv.style.display = 'none';
@@ -1104,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 priceSpan.classList.add('pulse');
                 setTimeout(() => priceSpan.classList.remove('pulse'), 1000);
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                
+
                 // Refresh history if tab is active
                 if (document.getElementById('history-tab').classList.contains('active')) {
                     loadHistory();
@@ -1139,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const inputs = document.querySelectorAll('input[type="number"]');
     inputs.forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             const min = parseFloat(this.min);
             const max = parseFloat(this.max);
             let value = parseFloat(this.value);
@@ -1148,4 +1156,65 @@ document.addEventListener('DOMContentLoaded', function() {
             if (value > max) this.value = max;
         });
     });
+});
+
+// Feedback Modal
+let currentFeedbackId = null;
+
+function showFeedbackModal(predictionId) {
+    currentFeedbackId = predictionId;
+    document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+    currentFeedbackId = null;
+    document.getElementById('actualPrice').value = '';
+}
+
+function submitFeedback() {
+    const actualPrice = document.getElementById('actualPrice').value;
+    const rating = document.querySelector('.star.active')?.getAttribute('data-rating') || 3;
+
+    if (!actualPrice) {
+        alert('Please enter the actual sale price');
+        return;
+    }
+
+    fetch(`http://localhost:5000/api/feedback/${currentFeedbackId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            actual_price: parseFloat(actualPrice),
+            user_rating: parseInt(rating)
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Thank you for your feedback! The model will be improved.');
+                closeFeedbackModal();
+                location.reload(); // Refresh to see updated history
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to submit feedback');
+        });
+}
+
+// Star rating setup
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('star')) {
+        const rating = e.target.getAttribute('data-rating');
+        document.querySelectorAll('.star').forEach(star => {
+            if (star.getAttribute('data-rating') <= rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
 });
