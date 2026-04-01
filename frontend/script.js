@@ -1,6 +1,8 @@
 // Global variables
 let charts = {};
 let plotlyChart = null;
+let distributionChart = null;
+let currentDistributionView = 'histogram';
 
 // Tab switching
 function switchTab(tabName) {
@@ -12,13 +14,6 @@ function switchTab(tabName) {
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
     event.target.classList.add('active');
-
-    // Add this inside your switchTab function
-if (tabName === 'history') {
-    setTimeout(() => {
-        loadHistory();
-    }, 100);
-}
 
     if (tabName === 'analytics') {
         setTimeout(() => {
@@ -35,13 +30,16 @@ if (tabName === 'history') {
         setTimeout(() => {
             updateHeatmap();
             loadPriceDistribution();
-            loadBoxplot();
+            updateBoxplot();
             loadCorrelationTable();
         }, 100);
     }
 
-    if (tabName === 'insights') {
-        loadInsights();
+    if (tabName === 'history') {
+        setTimeout(() => {
+            loadHistory();
+            loadHistoryStats();
+        }, 100);
     }
 }
 
@@ -543,153 +541,498 @@ async function loadCorrelationTable() {
     }
 }
 
-// Load price distribution histogram
+// Change distribution view type
+function changeDistributionView(view) {
+    currentDistributionView = view;
+    
+    // Update active button styling
+    document.querySelectorAll('.dist-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    loadPriceDistribution();
+}
+
+// Improved Price Distribution Function
 async function loadPriceDistribution() {
     try {
         const response = await fetch('http://localhost:5000/api/price-distribution');
         const data = await response.json();
-
-        const ctx = document.getElementById('priceHistogram').getContext('2d');
-
-        const minPrice = Math.min(...data.prices);
-        const maxPrice = Math.max(...data.prices);
-        const binCount = 40;
+        
+        const prices = data.prices;
+        
+        // Calculate statistics
+        const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
+        const median = [...prices].sort((a, b) => a - b)[Math.floor(prices.length / 2)];
+        const stdDev = Math.sqrt(prices.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / prices.length);
+        
+        // Create histogram bins
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const binCount = 30;
         const binWidth = (maxPrice - minPrice) / binCount;
-
+        
         const bins = Array(binCount).fill(0);
-        data.prices.forEach(price => {
+        const binEdges = [];
+        
+        for (let i = 0; i <= binCount; i++) {
+            binEdges.push(minPrice + i * binWidth);
+        }
+        
+        prices.forEach(price => {
             const binIndex = Math.min(Math.floor((price - minPrice) / binWidth), binCount - 1);
             bins[binIndex]++;
         });
-
-        const labels = Array(binCount).fill().map((_, i) => {
-            const start = minPrice + i * binWidth;
-            const end = start + binWidth;
-            return `$${Math.round(start / 1000)}k-$${Math.round(end / 1000)}k`;
-        });
-
-        if (charts.priceHistogram) charts.priceHistogram.destroy();
-
-        charts.priceHistogram = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Number of Houses',
-                    data: bins,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: { legend: { position: 'top' } },
-                scales: {
-                    y: { title: { display: true, text: 'Frequency' } },
-                    x: { ticks: { rotation: 45, autoSkip: true, maxTicksLimit: 10 } }
-                }
+        
+        const binCenters = [];
+        for (let i = 0; i < binCount; i++) {
+            binCenters.push(minPrice + (i + 0.5) * binWidth);
+        }
+        
+        // Create trace based on view type
+        let trace;
+        
+        if (currentDistributionView === 'histogram') {
+            trace = {
+                x: binCenters,
+                y: bins,
+                type: 'bar',
+                name: 'Frequency',
+                marker: {
+                    color: 'rgba(54, 162, 235, 0.7)',
+                    line: {
+                        color: 'rgba(54, 162, 235, 1)',
+                        width: 1
+                    }
+                },
+                hovertemplate: 'Price: $%{x:,.0f}<br>Houses: %{y}<extra></extra>'
+            };
+        } else if (currentDistributionView === 'density') {
+            // Calculate density
+            const total = prices.length;
+            const density = bins.map(count => (count / total) / binWidth * 1000000);
+            
+            trace = {
+                x: binCenters,
+                y: density,
+                type: 'scatter',
+                mode: 'lines+fill',
+                name: 'Density',
+                fill: 'tozeroy',
+                line: {
+                    color: 'rgba(75, 192, 192, 1)',
+                    width: 2
+                },
+                fillcolor: 'rgba(75, 192, 192, 0.3)',
+                hovertemplate: 'Price: $%{x:,.0f}<br>Density: %{y:.2f}<extra></extra>'
+            };
+        } else {
+            // Cumulative distribution
+            const total = prices.length;
+            const cumulative = [];
+            for (let i = 0; i <= binCount; i++) {
+                const threshold = minPrice + i * binWidth;
+                const countBelow = prices.filter(p => p <= threshold).length;
+                cumulative.push((countBelow / total) * 100);
             }
-        });
+            
+            trace = {
+                x: binEdges,
+                y: cumulative,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Cumulative %',
+                line: {
+                    color: 'rgba(153, 102, 255, 1)',
+                    width: 2
+                },
+                marker: {
+                    size: 4,
+                    color: 'rgba(153, 102, 255, 1)'
+                },
+                fill: 'tozeroy',
+                fillcolor: 'rgba(153, 102, 255, 0.2)',
+                hovertemplate: 'Price: $%{x:,.0f}<br>Cumulative: %{y:.1f}%<extra></extra>'
+            };
+        }
+        
+        const layout = {
+            title: {
+                text: currentDistributionView === 'histogram' ? 'House Price Distribution' :
+                       currentDistributionView === 'density' ? 'Price Density Distribution' :
+                       'Cumulative Price Distribution',
+                font: { size: 14, family: 'Segoe UI' }
+            },
+            xaxis: {
+                title: 'Sale Price ($)',
+                tickformat: '$,.0f',
+                gridcolor: '#e0e0e0',
+                zerolinecolor: '#cccccc'
+            },
+            yaxis: {
+                title: currentDistributionView === 'histogram' ? 'Number of Houses' :
+                       currentDistributionView === 'density' ? 'Density (per million $)' :
+                       'Cumulative Percentage (%)',
+                gridcolor: '#e0e0e0',
+                zerolinecolor: '#cccccc'
+            },
+            height: 450,
+            margin: { l: 70, r: 50, t: 60, b: 50 },
+            plot_bgcolor: '#fafafa',
+            paper_bgcolor: '#ffffff',
+            bargap: 0.05,
+            showlegend: false
+        };
+        
+        // Add vertical line for mean and median for histogram and density
+        if (currentDistributionView === 'histogram' || currentDistributionView === 'density') {
+            const shapes = [
+                {
+                    type: 'line',
+                    x0: mean,
+                    x1: mean,
+                    y0: 0,
+                    y1: 1,
+                    yref: 'paper',
+                    line: { color: 'red', width: 2, dash: 'dash' },
+                    name: 'Mean'
+                },
+                {
+                    type: 'line',
+                    x0: median,
+                    x1: median,
+                    y0: 0,
+                    y1: 1,
+                    yref: 'paper',
+                    line: { color: 'green', width: 2, dash: 'dash' },
+                    name: 'Median'
+                }
+            ];
+            layout.shapes = shapes;
+        }
+        
+        Plotly.newPlot('priceDistributionContainer', [trace], layout);
+        
+        // Update statistics display
+        const skewness = ((mean - median) / stdDev).toFixed(2);
+        const statsHtml = `
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="stat-label">Mean Price</span>
+                    <span class="stat-value">$${mean.toLocaleString()}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Median Price</span>
+                    <span class="stat-value">$${median.toLocaleString()}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Std Deviation</span>
+                    <span class="stat-value">$${stdDev.toLocaleString()}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Range</span>
+                    <span class="stat-value">$${minPrice.toLocaleString()} - $${maxPrice.toLocaleString()}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Skewness</span>
+                    <span class="stat-value">${skewness}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Total Houses</span>
+                    <span class="stat-value">${prices.length.toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+        document.getElementById('price-distribution-stats').innerHTML = statsHtml;
+        
     } catch (error) {
         console.error('Error loading price distribution:', error);
     }
 }
 
-// Load boxplot
-async function loadBoxplot() {
+// Improved Box Plot Function
+async function updateBoxplot() {
     try {
+        const sortBy = document.getElementById('boxplotSortBy').value;
+        const topN = parseInt(document.getElementById('boxplotTopN').value);
+        
         const response = await fetch('http://localhost:5000/api/boxplot-data?feature=Neighborhood');
         const data = await response.json();
-
-        const trace = {
-            y: data.data,
-            type: 'box',
-            name: data.categories,
-            boxpoints: 'all',
-            jitter: 0.3,
-            pointpos: -1.8,
-            marker: { color: 'rgba(54, 162, 235, 0.5)' }
-        };
-
+        
+        // Create data array for sorting
+        let neighborhoods = [];
+        for (let i = 0; i < data.categories.length; i++) {
+            const prices = [...data.data[i]].sort((a, b) => a - b);
+            const median = prices[Math.floor(prices.length / 2)];
+            const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const q1 = prices[Math.floor(prices.length * 0.25)];
+            const q3 = prices[Math.floor(prices.length * 0.75)];
+            
+            neighborhoods.push({
+                name: data.categories[i],
+                prices: data.data[i],
+                median: median,
+                mean: mean,
+                min: min,
+                max: max,
+                q1: q1,
+                q3: q3,
+                count: prices.length
+            });
+        }
+        
+        // Sort based on selection
+        if (sortBy === 'price') {
+            neighborhoods.sort((a, b) => b.median - a.median);
+        } else if (sortBy === 'name') {
+            neighborhoods.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortBy === 'count') {
+            neighborhoods.sort((a, b) => b.count - a.count);
+        }
+        
+        // Take top N
+        const topNeighborhoods = neighborhoods.slice(0, topN);
+        
+        // Prepare data for Plotly
+        const traces = [];
+        const colors = [
+            'rgba(54, 162, 235, 0.7)', 'rgba(255, 99, 132, 0.7)',
+            'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)', 'rgba(255, 205, 86, 0.7)',
+            'rgba(201, 203, 207, 0.7)', 'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)'
+        ];
+        
+        topNeighborhoods.forEach((hood, idx) => {
+            const trace = {
+                y: hood.prices,
+                type: 'box',
+                name: hood.name,
+                boxmean: 'sd',
+                marker: { color: colors[idx % colors.length] },
+                line: { width: 2 },
+                boxpoints: 'outliers',
+                jitter: 0.3,
+                pointpos: -1.5,
+                hoverinfo: 'y+name',
+                hovertemplate: '%{y:$,.0f}<extra></extra>'
+            };
+            traces.push(trace);
+        });
+        
         const layout = {
-            title: 'Price Distribution by Neighborhood',
-            xaxis: { title: 'Neighborhood', tickangle: -45 },
-            yaxis: { title: 'Price ($)', tickformat: '$,.0f' },
-            height: 500
+            title: {
+                text: 'Price Distribution by Neighborhood',
+                font: { size: 16, family: 'Segoe UI' }
+            },
+            xaxis: {
+                title: 'Neighborhood',
+                tickangle: -45,
+                tickfont: { size: 11 }
+            },
+            yaxis: {
+                title: 'Sale Price ($)',
+                tickformat: '$,.0f',
+                gridcolor: '#e0e0e0',
+                zerolinecolor: '#cccccc'
+            },
+            height: 500,
+            margin: { l: 80, r: 40, t: 60, b: 100 },
+            plot_bgcolor: '#fafafa',
+            paper_bgcolor: '#ffffff',
+            showlegend: false,
+            hovermode: 'closest'
         };
-
-        Plotly.newPlot('boxplotChart', [trace], layout);
+        
+        Plotly.newPlot('boxplotChart', traces, layout);
+        
+        // Generate insights
+        const bestNeighborhood = topNeighborhoods[0];
+        const worstNeighborhood = topNeighborhoods[topNeighborhoods.length - 1];
+        const priceGap = ((bestNeighborhood.median - worstNeighborhood.median) / worstNeighborhood.median * 100).toFixed(0);
+        const mostHouses = topNeighborhoods.reduce((max, h) => h.count > max.count ? h : max, topNeighborhoods[0]);
+        
+        const insightsHtml = `
+            <div class="boxplot-insights-content">
+                <h4>📊 Key Insights</h4>
+                <div class="insights-grid-small">
+                    <div class="insight-badge">
+                        <span class="emoji">🏆</span>
+                        <span><strong>Highest Price:</strong> ${bestNeighborhood.name}</span>
+                        <span>$${bestNeighborhood.median.toLocaleString()} (median)</span>
+                    </div>
+                    <div class="insight-badge">
+                        <span class="emoji">📉</span>
+                        <span><strong>Lowest Price:</strong> ${worstNeighborhood.name}</span>
+                        <span>$${worstNeighborhood.median.toLocaleString()} (median)</span>
+                    </div>
+                    <div class="insight-badge">
+                        <span class="emoji">📈</span>
+                        <span><strong>Price Gap:</strong> ${priceGap}% difference</span>
+                        <span>between top and bottom</span>
+                    </div>
+                    <div class="insight-badge">
+                        <span class="emoji">🏠</span>
+                        <span><strong>Most Houses:</strong> ${mostHouses.name}</span>
+                        <span>${mostHouses.count} properties</span>
+                    </div>
+                </div>
+                <div class="insight-note">
+                    💡 <strong>Investment Tip:</strong> ${bestNeighborhood.name} shows the highest median price. 
+                    Look for properties with Overall Quality ≥ 7 in this area for best ROI potential.
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('boxplot-insights').innerHTML = insightsHtml;
+        
     } catch (error) {
-        console.error('Error loading boxplot:', error);
+        console.error('Error updating boxplot:', error);
     }
 }
 
-// Load insights
-async function loadInsights() {
+// Load prediction history
+async function loadHistory() {
     try {
-        const neighborhoodResponse = await fetch('http://localhost:5000/api/price-by-neighborhood');
-        const neighborhoodData = await neighborhoodResponse.json();
-
-        const topNeighborhoods = neighborhoodData.neighborhoods.slice(0, 5);
-        const topPrices = neighborhoodData.means.slice(0, 5);
-
-        const bestNeighborhoodsHtml = topNeighborhoods.map((hood, i) =>
-            `<div class="insight-item">
-                <strong>${hood}</strong>: $${topPrices[i].toLocaleString()}
-                <span class="badge">Top ${i + 1}</span>
-            </div>`
-        ).join('');
-        document.getElementById('best-neighborhoods').innerHTML = bestNeighborhoodsHtml;
-
-        const importanceResponse = await fetch('http://localhost:5000/api/feature-importance');
-        const importanceData = await importanceResponse.json();
-
-        const topFeatures = importanceData.features.slice(0, 5);
-        const topImportance = importanceData.importance.slice(0, 5);
-
-        const valuableFeaturesHtml = topFeatures.map((feature, i) =>
-            `<div class="insight-item">
-                <strong>${feature.replace(/([A-Z])/g, ' $1').trim()}</strong>
-                <span class="badge">Impact: ${(topImportance[i] / topImportance[0] * 100).toFixed(0)}%</span>
-            </div>`
-        ).join('');
-        document.getElementById('valuable-features').innerHTML = valuableFeaturesHtml;
-
-        const appreciationFactors = [
-            "🏗️ <strong>Higher Overall Quality</strong> - Each point increase adds ~15-20% to value",
-            "📐 <strong>Larger Living Area</strong> - Every 100 sq ft adds ~$15,000",
-            "🚗 <strong>Garage Capacity</strong> - Each additional garage space adds ~$10,000",
-            "🛏️ <strong>More Bathrooms</strong> - Full bathroom adds ~$20,000",
-            "🔥 <strong>Fireplaces</strong> - Having a fireplace adds ~$15,000"
-        ];
-        document.getElementById('appreciation-factors').innerHTML = appreciationFactors.map(f => `<div class="insight-item">${f}</div>`).join('');
-
-        const depreciationFactors = [
-            "📅 <strong>Older Construction</strong> - Each decade older reduces value by ~5-8%",
-            "🔧 <strong>Poor Condition</strong> - Below average condition reduces value by ~20%",
-            "🏚️ <strong>Small Lot Size</strong> - Below median lot size reduces value by ~10%",
-            "🅿️ <strong>No Garage</strong> - Reduces value by ~$15,000-20,000",
-            "🌆 <strong>Undesirable Neighborhood</strong> - Can reduce value by 30-40%"
-        ];
-        document.getElementById('depreciation-factors').innerHTML = depreciationFactors.map(f => `<div class="insight-item">${f}</div>`).join('');
-
-        const recommendations = `
-            <p>🎯 <strong>Best Investment Strategy:</strong></p>
-            <ul>
-                <li>Focus on neighborhoods: ${topNeighborhoods.slice(0, 3).join(', ')}</li>
-                <li>Prioritize houses with Overall Quality ≥ 7</li>
-                <li>Look for properties with garage capacity ≥ 2 cars</li>
-                <li>Consider houses built after 2000 for better appreciation</li>
-                <li>Aim for living area between 1,500-2,500 sq ft for best ROI</li>
-            </ul>
-            <p>💰 <strong>Expected ROI:</strong> Properties in top neighborhoods with high quality ratings typically appreciate 5-8% annually.</p>
-        `;
-        document.getElementById('recommendations').innerHTML = recommendations;
+        const response = await fetch('http://localhost:5000/api/history');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayHistory(data.history);
+        } else {
+            console.error('Error loading history:', data.error);
+        }
     } catch (error) {
-        console.error('Error loading insights:', error);
+        console.error('Error loading history:', error);
+        document.getElementById('history-table-body').innerHTML = 
+            '<tr><td colspan="6" class="error-text">Failed to load history. Make sure server is running.</td></tr>';
     }
+}
+
+// Display history in table
+function displayHistory(history) {
+    const tbody = document.getElementById('history-table-body');
+    
+    if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-text">No predictions yet. Make a prediction to see it here!</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = history.map(item => {
+        // Get confidence range values
+        let confidenceDisplay = 'N/A';
+        if (item.formatted_lower && item.formatted_upper) {
+            confidenceDisplay = `${item.formatted_lower} - ${item.formatted_upper}`;
+        } else if (item.confidence_lower && item.confidence_upper) {
+            confidenceDisplay = `$${item.confidence_lower.toLocaleString()} - $${item.confidence_upper.toLocaleString()}`;
+        }
+        
+        return `
+            <tr>
+                <td>${new Date(item.timestamp).toLocaleString()}</td>
+                <td class="price-cell">${item.formatted_price || `$${item.predicted_price?.toLocaleString()}`}</td>
+                <td>${confidenceDisplay}</td>
+                <td>
+                    <div class="feature-badges">
+                        <span class="badge">🏠 ${item.input_features?.GrLivArea || 0} sqft</span>
+                        <span class="badge">⭐ Q${item.input_features?.OverallQual || 0}</span>
+                        <span class="badge">📅 ${item.input_features?.YearBuilt || 0}</span>
+                        <span class="badge">📍 ${item.input_features?.Neighborhood || 'Unknown'}</span>
+                    </div>
+                </td>
+                <td class="${item.vs_average_percent?.includes('-') ? 'negative' : 'positive'}">
+                    ${item.vs_average_diff || 'N/A'} (${item.vs_average_percent || 'N/A'})
+                </td>
+                <td>
+                    <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Load history statistics
+async function loadHistoryStats() {
+    try {
+        const response = await fetch('http://localhost:5000/api/history/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('total-predictions').textContent = data.total_predictions;
+            document.getElementById('avg-prediction').textContent = `$${data.avg_prediction.toLocaleString()}`;
+            document.getElementById('max-prediction').textContent = `$${data.max_prediction.toLocaleString()}`;
+            document.getElementById('min-prediction').textContent = `$${data.min_prediction.toLocaleString()}`;
+        }
+    } catch (error) {
+        console.error('Error loading history stats:', error);
+    }
+}
+
+// Delete a single prediction
+async function deletePrediction(id) {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/history/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                loadHistory();
+                loadHistoryStats();
+                showToast('Prediction deleted successfully!');
+            } else {
+                alert('Error deleting prediction: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error deleting prediction:', error);
+            alert('Failed to delete prediction');
+        }
+    }
+}
+
+// Clear all history
+async function clearHistory() {
+    if (confirm('⚠️ Are you sure you want to clear ALL prediction history? This action cannot be undone!')) {
+        try {
+            const response = await fetch('http://localhost:5000/api/history/clear', {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                loadHistory();
+                loadHistoryStats();
+                showToast('All history cleared successfully!');
+            } else {
+                alert('Error clearing history: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error clearing history:', error);
+            alert('Failed to clear history');
+        }
+    }
+}
+
+// Show toast notification
+function showToast(message) {
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }
 
 // Prediction form handling
@@ -757,6 +1100,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 priceSpan.classList.add('pulse');
                 setTimeout(() => priceSpan.classList.remove('pulse'), 1000);
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Refresh history if tab is active
+                if (document.getElementById('history-tab').classList.contains('active')) {
+                    loadHistory();
+                    loadHistoryStats();
+                }
             } else {
                 showError(data.error || 'Prediction failed');
             }
@@ -796,146 +1145,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Load prediction history
-async function loadHistory() {
-    try {
-        const response = await fetch('http://localhost:5000/api/history');
-        const data = await response.json();
-        
-        if (data.success) {
-            displayHistory(data.history);
-            loadHistoryStats();
-        } else {
-            console.error('Error loading history:', data.error);
-        }
-    } catch (error) {
-        console.error('Error loading history:', error);
-        document.getElementById('history-table-body').innerHTML = 
-            '<tr><td colspan="6" class="error-text">Failed to load history. Make sure server is running.</td></tr>';
-    }
-}
-
-// Display history in table
-function displayHistory(history) {
-    const tbody = document.getElementById('history-table-body');
-    
-    if (history.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-text">No predictions yet. Make a prediction to see it here!</td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = history.map(item => {
-        // Debug: log the item to see what's available
-        console.log('History item:', item);
-        
-        // Get confidence range values - handle both possible formats
-        let confidenceDisplay = 'N/A';
-        if (item.formatted_lower && item.formatted_upper) {
-            confidenceDisplay = `${item.formatted_lower} - ${item.formatted_upper}`;
-        } else if (item.confidence_lower && item.confidence_upper) {
-            confidenceDisplay = `$${item.confidence_lower.toLocaleString()} - $${item.confidence_upper.toLocaleString()}`;
-        }
-        
-        return `
-            <tr>
-                <td>${new Date(item.timestamp).toLocaleString()}</td>
-                <td class="price-cell">${item.formatted_price || `$${item.predicted_price?.toLocaleString()}`}</td>
-                <td>${confidenceDisplay}</td>
-                <td>
-                    <div class="feature-badges">
-                        <span class="badge">🏠 ${item.input_features?.GrLivArea || 0} sqft</span>
-                        <span class="badge">⭐ Q${item.input_features?.OverallQual || 0}</span>
-                        <span class="badge">📅 ${item.input_features?.YearBuilt || 0}</span>
-                        <span class="badge">📍 ${item.input_features?.Neighborhood || 'Unknown'}</span>
-                    </div>
-                </td>
-                <td class="${item.vs_average_percent?.includes('-') ? 'negative' : 'positive'}">
-                    ${item.vs_average_diff || 'N/A'} (${item.vs_average_percent || 'N/A'})
-                </td>
-                <td>
-                    <button class="btn-delete" onclick="deletePrediction(${item.id})">🗑️</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-// Load history statistics
-async function loadHistoryStats() {
-    try {
-        const response = await fetch('http://localhost:5000/api/history/stats');
-        const data = await response.json();
-        
-        if (data.success) {
-            document.getElementById('total-predictions').textContent = data.total_predictions;
-            document.getElementById('avg-prediction').textContent = `$${data.avg_prediction.toLocaleString()}`;
-            document.getElementById('max-prediction').textContent = `$${data.max_prediction.toLocaleString()}`;
-            document.getElementById('min-prediction').textContent = `$${data.min_prediction.toLocaleString()}`;
-        }
-    } catch (error) {
-        console.error('Error loading history stats:', error);
-    }
-}
-
-// Delete a single prediction
-async function deletePrediction(id) {
-    if (confirm('Are you sure you want to delete this prediction?')) {
-        try {
-            const response = await fetch(`http://localhost:5000/api/history/delete/${id}`, {
-                method: 'DELETE'
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                loadHistory(); // Refresh the history
-                showToast('Prediction deleted successfully!');
-            } else {
-                alert('Error deleting prediction: ' + data.error);
-            }
-        } catch (error) {
-            console.error('Error deleting prediction:', error);
-            alert('Failed to delete prediction');
-        }
-    }
-}
-
-// Clear all history
-async function clearHistory() {
-    if (confirm('⚠️ Are you sure you want to clear ALL prediction history? This action cannot be undone!')) {
-        try {
-            const response = await fetch('http://localhost:5000/api/history/clear', {
-                method: 'DELETE'
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                loadHistory(); // Refresh the history
-                showToast('All history cleared successfully!');
-            } else {
-                alert('Error clearing history: ' + data.error);
-            }
-        } catch (error) {
-            console.error('Error clearing history:', error);
-            alert('Failed to clear history');
-        }
-    }
-}
-
-// Show toast notification
-function showToast(message) {
-    // Create toast element if it doesn't exist
-    let toast = document.querySelector('.toast-notification');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.className = 'toast-notification';
-        document.body.appendChild(toast);
-    }
-    
-    toast.textContent = message;
-    toast.classList.add('show');
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
