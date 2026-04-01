@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ames House Price Predictor - 3D Analytics Dashboard</title>
+    <title>Ames House Price Predictor - Smart Real Estate Analytics</title>
     <link rel="stylesheet" href="style.css">
     <!-- Plotly CDN for 3D charts -->
     <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
@@ -16,19 +16,150 @@
     <div class="container">
         <header>
             <h1>🏠 Ames House Price Predictor</h1>
-            <p>Advanced 3D Analytics & Machine Learning Dashboard</p>
+            <p>Smart Real Estate Analytics with Machine Learning</p>
         </header>
 
-        <!-- Navigation Tabs (Removed Market Insights) -->
+        <!-- Navigation Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('predictor')">🏡 Price Predictor</button>
-            <button class="tab-btn" onclick="switchTab('analytics')">📊 3D Analytics Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('correlation')">🔥 Correlation Analysis</button>
+            <button class="tab-btn active" onclick="switchTab('home')">🏠 Home</button>
+            <button class="tab-btn" onclick="switchTab('predictor')">🏡 Price Predictor</button>
+            <button class="tab-btn" onclick="switchTab('analytics')">📊 3D Analytics</button>
+            <button class="tab-btn" onclick="switchTab('correlation')">🔥 Correlation</button>
             <button class="tab-btn" onclick="switchTab('history')">📜 History</button>
+            <button class="tab-btn" onclick="switchTab('about')">ℹ️ About</button>
         </div>
 
-        <!-- Tab 1: Price Predictor -->
-        <div id="predictor-tab" class="tab-content active">
+        <!-- ==================== TAB 1: HOME PAGE ==================== -->
+        <div id="home-tab" class="tab-content active">
+            <div class="home-container">
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h2>Welcome to Ames House Price Predictor</h2>
+                        <p class="hero-subtitle">Powered by Ridge Regression Machine Learning</p>
+                        <p class="hero-description">Predict house prices with 88-90% accuracy using advanced analytics
+                            and 3D visualizations</p>
+                        <div class="hero-buttons">
+                            <button class="hero-btn primary" onclick="switchTab('predictor')">🎯 Start
+                                Predicting</button>
+                            <button class="hero-btn secondary" onclick="switchTab('analytics')">📊 Explore
+                                Analytics</button>
+                        </div>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-card-home">
+                            <div class="stat-number" id="home-avg-price">Loading...</div>
+                            <div class="stat-label">Average House Price</div>
+                        </div>
+                        <div class="stat-card-home">
+                            <div class="stat-number" id="home-total-houses">Loading...</div>
+                            <div class="stat-label">Properties Analyzed</div>
+                        </div>
+                        <div class="stat-card-home">
+                            <div class="stat-number">22</div>
+                            <div class="stat-label">Key Features</div>
+                        </div>
+                        <div class="stat-card-home">
+                            <div class="stat-number">88-90%</div>
+                            <div class="stat-label">Model Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Section -->
+                <div class="features-section">
+                    <h3>✨ Key Features</h3>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h4>Accurate Predictions</h4>
+                            <p>Ridge Regression model with 88-90% R² accuracy trained on 1460+ houses</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h4>3D Analytics</h4>
+                            <p>Interactive 3D visualizations to understand price relationships</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔥</div>
+                            <h4>Correlation Analysis</h4>
+                            <p>Heatmaps and correlation matrices to identify key price drivers</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📜</div>
+                            <h4>Prediction History</h4>
+                            <p>Track all your predictions and provide feedback to improve the model</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <h4>Active Learning</h4>
+                            <p>Model improves with every verified prediction</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🏆</div>
+                            <h4>Top Features</h4>
+                            <p>Overall Quality, Living Area, Year Built, Garage Size</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Predict Section -->
+                <div class="quick-predict-section">
+                    <h3>🚀 Quick Prediction</h3>
+                    <p>Try a quick prediction with these typical values</p>
+                    <div class="quick-predict-grid">
+                        <div class="quick-card" onclick="quickPredict('average')">
+                            <div class="quick-icon">🏠</div>
+                            <h4>Average Home</h4>
+                            <p>1500 sqft living area<br>Overall Quality 6<br>Built in 2000</p>
+                            <span class="quick-badge">Try Now →</span>
+                        </div>
+                        <div class="quick-card" onclick="quickPredict('luxury')">
+                            <div class="quick-icon">💎</div>
+                            <h4>Luxury Home</h4>
+                            <p>3000 sqft living area<br>Overall Quality 9<br>Built in 2015</p>
+                            <span class="quick-badge">Try Now →</span>
+                        </div>
+                        <div class="quick-card" onclick="quickPredict('budget')">
+                            <div class="quick-icon">💰</div>
+                            <h4>Budget Home</h4>
+                            <p>900 sqft living area<br>Overall Quality 4<br>Built in 1970</p>
+                            <span class="quick-badge">Try Now →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="how-it-works">
+                    <h3>📋 How It Works</h3>
+                    <div class="steps-grid">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <h4>Enter House Details</h4>
+                            <p>Fill in the house features like size, quality, location, and amenities</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <h4>Get Instant Prediction</h4>
+                            <p>Our ML model analyzes 22 features and provides price estimate with confidence range</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <h4>Explore Analytics</h4>
+                            <p>View 3D visualizations and correlation analysis to understand price drivers</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <h4>Provide Feedback</h4>
+                            <p>Add actual sale prices to help improve the model for everyone</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: PRICE PREDICTOR ==================== -->
+        <div id="predictor-tab" class="tab-content">
             <main>
                 <div class="prediction-card">
                     <h2>Key House Details</h2>
@@ -37,13 +168,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GrLivArea">Living Area (sq ft):</label>
-                                <input type="number" id="GrLivArea" name="GrLivArea" required min="0" max="10000"
+                                <input type="number" id="GrLivArea" name="GrLivArea" required min="300" max="10000"
                                     value="1500">
                                 <small>Above grade living area</small>
                             </div>
                             <div class="form-group">
                                 <label for="LotArea">Lot Area (sq ft):</label>
-                                <input type="number" id="LotArea" name="LotArea" required min="0" max="200000"
+                                <input type="number" id="LotArea" name="LotArea" required min="1000" max="200000"
                                     value="10000">
                             </div>
                         </div>
@@ -56,7 +187,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="1stFlrSF">First Floor SF:</label>
-                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="0" max="10000"
+                                <input type="number" id="1stFlrSF" name="1stFlrSF" required min="300" max="10000"
                                     value="1000">
                             </div>
                         </div>
@@ -83,8 +214,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="YearRemodAdd">Year Remodeled:</label>
-                                <input type="number" id="YearRemodAdd" name="YearRemodAdd" required min="1800"
-                                    max="2025" value="2000">
+                                <input type="number" id="YearRemodAdd" name="YearRemodAdd" required min="1800" max="2025"
+                                    value="2000">
                             </div>
                         </div>
 
@@ -108,8 +239,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="Fireplaces">Fireplaces:</label>
-                                <input type="number" id="Fireplaces" name="Fireplaces" required min="0" max="4"
-                                    value="1">
+                                <input type="number" id="Fireplaces" name="Fireplaces" required min="0" max="4" value="1">
                             </div>
                         </div>
 
@@ -117,8 +247,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="GarageCars">Garage Capacity (cars):</label>
-                                <input type="number" id="GarageCars" name="GarageCars" required min="0" max="5"
-                                    value="2">
+                                <input type="number" id="GarageCars" name="GarageCars" required min="0" max="5" value="2">
                             </div>
                             <div class="form-group">
                                 <label for="GarageArea">Garage Area (sq ft):</label>
@@ -221,10 +350,9 @@
             </main>
         </div>
 
-        <!-- Tab 2: 3D Analytics Dashboard -->
+        <!-- ==================== TAB 3: 3D ANALYTICS DASHBOARD ==================== -->
         <div id="analytics-tab" class="tab-content">
             <div class="dashboard">
-                <!-- Key Metrics Cards -->
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <h3>Average Price</h3>
@@ -248,7 +376,6 @@
                     </div>
                 </div>
 
-                <!-- Chart Type Selector - Only 2D and 3D Scatter -->
                 <div class="chart-controls">
                     <div class="control-group">
                         <label>Chart Type:</label>
@@ -258,7 +385,6 @@
                         </select>
                     </div>
 
-                    <!-- 2D Axis Controls (visible by default) -->
                     <div id="controls2D" class="axis-controls">
                         <div class="control-group">
                             <label>X-Axis:</label>
@@ -269,8 +395,6 @@
                                 <option value="OverallQual">Overall Quality (1-10)</option>
                                 <option value="YearBuilt">Year Built</option>
                                 <option value="GarageCars">Garage Capacity</option>
-                                <option value="BedroomAbvGr">Bedrooms</option>
-                                <option value="FullBath">Full Bathrooms</option>
                             </select>
                         </div>
                         <div class="control-group">
@@ -279,24 +403,18 @@
                                 <option value="OverallQual">Overall Quality</option>
                                 <option value="YearBuilt">Year Built</option>
                                 <option value="GarageCars">Garage Capacity</option>
-                                <option value="TotalBsmtSF">Basement Area</option>
-                                <option value="LotArea">Lot Area</option>
-                                <option value="BedroomAbvGr">Bedrooms</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- 3D Axis Controls (hidden by default) -->
                     <div id="controls3D" class="axis-controls" style="display: none;">
                         <div class="control-group">
                             <label>X-Axis:</label>
                             <select id="axisX_3d" onchange="updateChart()">
                                 <option value="GrLivArea">Living Area (sq ft)</option>
                                 <option value="TotalBsmtSF">Basement Area (sq ft)</option>
-                                <option value="LotArea">Lot Area (sq ft)</option>
                                 <option value="OverallQual">Overall Quality (1-10)</option>
                                 <option value="YearBuilt">Year Built</option>
-                                <option value="GarageCars">Garage Capacity</option>
                             </select>
                         </div>
                         <div class="control-group">
@@ -304,38 +422,30 @@
                             <select id="axisY_3d" onchange="updateChart()">
                                 <option value="OverallQual">Overall Quality (1-10)</option>
                                 <option value="GrLivArea">Living Area (sq ft)</option>
-                                <option value="TotalBsmtSF">Basement Area (sq ft)</option>
                                 <option value="YearBuilt">Year Built</option>
-                                <option value="GarageCars">Garage Capacity</option>
-                                <option value="LotArea">Lot Area (sq ft)</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Chart Container -->
                 <div class="chart-card full-width">
                     <h3 id="chartTitle">📊 2D Scatter Plot</h3>
                     <div id="plotlyChart" style="height: 600px;"></div>
                 </div>
 
-                <!-- Additional Charts -->
                 <div class="charts-grid">
                     <div class="chart-card">
                         <h3>💰 Price by Neighborhood</h3>
                         <canvas id="neighborhoodChart"></canvas>
                     </div>
-
                     <div class="chart-card">
                         <h3>📅 Price Trends Over Years</h3>
                         <canvas id="yearTrendChart"></canvas>
                     </div>
-
                     <div class="chart-card">
                         <h3>⭐ Price by Overall Quality</h3>
                         <canvas id="qualityChart"></canvas>
                     </div>
-
                     <div class="chart-card">
                         <h3>🎯 Top 15 Feature Importance</h3>
                         <canvas id="featureImportanceChart"></canvas>
@@ -344,7 +454,7 @@
             </div>
         </div>
 
-        <!-- Tab 3: Correlation Analysis (Improved) -->
+        <!-- ==================== TAB 4: CORRELATION ANALYSIS ==================== -->
         <div id="correlation-tab" class="tab-content">
             <div class="dashboard">
                 <div class="chart-card full-width">
@@ -362,27 +472,25 @@
                             <option value="RdBu">Red-Blue (RdBu)</option>
                             <option value="Viridis">Viridis</option>
                             <option value="Plasma">Plasma</option>
-                            <option value="Cividis">Cividis</option>
                         </select>
                     </div>
                     <div id="correlationHeatmap" style="height: 800px;"></div>
                 </div>
 
                 <div class="charts-grid">
-                    <!-- Improved Price Distribution Chart -->
+                    <!-- Price Distribution Chart -->
                     <div class="chart-card">
                         <h3>📈 Price Distribution Analysis</h3>
                         <div class="distribution-controls">
-                            <button class="dist-btn active"
-                                onclick="changeDistributionView('histogram')">Histogram</button>
+                            <button class="dist-btn active" onclick="changeDistributionView('histogram')">Histogram</button>
                             <button class="dist-btn" onclick="changeDistributionView('density')">Density Plot</button>
                             <button class="dist-btn" onclick="changeDistributionView('cumulative')">Cumulative</button>
                         </div>
                         <div id="priceDistributionContainer" style="height: 450px;"></div>
-                        <div class="distribution-stats" id="price-distribution-stats"></div>
+                        <div id="price-distribution-stats" class="distribution-stats"></div>
                     </div>
 
-                    <!-- Improved Box Plot by Neighborhood -->
+                    <!-- Box Plot by Neighborhood -->
                     <div class="chart-card">
                         <h3>📊 Neighborhood Price Analysis</h3>
                         <div class="boxplot-controls">
@@ -397,11 +505,10 @@
                                 <option value="8">Top 8</option>
                                 <option value="10" selected>Top 10</option>
                                 <option value="12">Top 12</option>
-                                <option value="15">Top 15</option>
                             </select>
                         </div>
                         <div id="boxplotChart" style="height: 500px;"></div>
-                        <div class="boxplot-insights" id="boxplot-insights"></div>
+                        <div id="boxplot-insights" class="boxplot-insights"></div>
                     </div>
                 </div>
 
@@ -412,7 +519,7 @@
             </div>
         </div>
 
-        <!-- Tab 4: History -->
+        <!-- ==================== TAB 5: HISTORY ==================== -->
         <div id="history-tab" class="tab-content">
             <div class="history-dashboard">
                 <div class="history-header">
@@ -423,7 +530,6 @@
                     </div>
                 </div>
 
-                <!-- History Statistics -->
                 <div class="history-stats-grid">
                     <div class="stat-card">
                         <h4>Total Predictions</h4>
@@ -443,47 +549,180 @@
                     </div>
                 </div>
 
-                <!-- History Table -->
                 <div class="history-table-container">
-                    <table class="history-table" id="history-table">
+                    <table class="history-table">
                         <thead>
-                            <tr>
+                            32
                                 <th>Date & Time</th>
                                 <th>Predicted Price</th>
                                 <th>Confidence Range</th>
                                 <th>Key Features</th>
                                 <th>vs Average</th>
                                 <th>Action</th>
-                            </tr>
+                            32
                         </thead>
                         <tbody id="history-table-body">
-                            <tr>
+                            32
                                 <td colspan="6" class="loading-text">Loading history...</td>
-                            </tr>
+                            32
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- ==================== TAB 6: ABOUT PAGE ==================== -->
+        <div id="about-tab" class="tab-content">
+            <div class="about-container">
+                <div class="about-header">
+                    <h2>ℹ️ About This Project</h2>
+                    <p>Advanced House Price Prediction System with Machine Learning</p>
+                </div>
+
+                <div class="about-content">
+                    <div class="about-section">
+                        <h3>🎯 Project Overview</h3>
+                        <p>The Ames House Price Predictor is a sophisticated machine learning application that predicts
+                            house prices based on various features. Built with Ridge Regression, the model analyzes 22
+                            different factors to provide accurate price estimates with 88-90% accuracy.</p>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>📊 Dataset Information</h3>
+                        <p>The model is trained on the famous Ames Housing Dataset from Iowa, containing 1,460 houses with
+                            79 explanatory variables. The dataset includes detailed information about:</p>
+                        <ul>
+                            <li><strong>Size & Area:</strong> Living area, lot size, basement, garage</li>
+                            <li><strong>Quality & Condition:</strong> Overall quality, condition, year built</li>
+                            <li><strong>Rooms & Amenities:</strong> Bedrooms, bathrooms, fireplaces</li>
+                            <li><strong>Location:</strong> Neighborhood, zoning classification</li>
+                            <li><strong>Outdoor Features:</strong> Deck, porch, patio areas</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>🤖 Machine Learning Model</h3>
+                        <div class="model-details">
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">Algorithm:</span>
+                                <span class="model-detail-value">Ridge Regression (L2 Regularization)</span>
+                            </div>
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">Features:</span>
+                                <span class="model-detail-value">22 key features</span>
+                            </div>
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">Training Samples:</span>
+                                <span class="model-detail-value">1,460 houses</span>
+                            </div>
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">Accuracy (R²):</span>
+                                <span class="model-detail-value">88-90%</span>
+                            </div>
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">RMSE:</span>
+                                <span class="model-detail-value">~$15,000</span>
+                            </div>
+                            <div class="model-detail-card">
+                                <span class="model-detail-label">MAE:</span>
+                                <span class="model-detail-value">~$12,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>📈 Top Price Drivers</h3>
+                        <div class="top-drivers">
+                            <div class="driver-item">
+                                <div class="driver-rank">1</div>
+                                <div class="driver-info">
+                                    <strong>Overall Quality</strong>
+                                    <p>Most significant factor - each point increase adds 15-20% to value</p>
+                                </div>
+                            </div>
+                            <div class="driver-item">
+                                <div class="driver-rank">2</div>
+                                <div class="driver-info">
+                                    <strong>Living Area (GrLivArea)</strong>
+                                    <p>Every 100 sq ft adds approximately $15,000 to price</p>
+                                </div>
+                            </div>
+                            <div class="driver-item">
+                                <div class="driver-rank">3</div>
+                                <div class="driver-info">
+                                    <strong>Year Built</strong>
+                                    <p>Newer houses command premium prices</p>
+                                </div>
+                            </div>
+                            <div class="driver-item">
+                                <div class="driver-rank">4</div>
+                                <div class="driver-info">
+                                    <strong>Neighborhood</strong>
+                                    <p>Location significantly impacts property value</p>
+                                </div>
+                            </div>
+                            <div class="driver-item">
+                                <div class="driver-rank">5</div>
+                                <div class="driver-info">
+                                    <strong>Garage Capacity</strong>
+                                    <p>Each additional garage space adds ~$10,000</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>🛠️ Technologies Used</h3>
+                        <div class="tech-stack">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">Flask</span>
+                            <span class="tech-badge">Scikit-learn</span>
+                            <span class="tech-badge">Pandas</span>
+                            <span class="tech-badge">NumPy</span>
+                            <span class="tech-badge">Plotly</span>
+                            <span class="tech-badge">Chart.js</span>
+                            <span class="tech-badge">SQLite</span>
+                            <span class="tech-badge">HTML5/CSS3</span>
+                            <span class="tech-badge">JavaScript</span>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>🚀 Future Enhancements</h3>
+                        <ul>
+                            <li>Deep Learning integration for improved accuracy</li>
+                            <li>Real-time market data integration</li>
+                            <li>Mobile app development</li>
+                            <li>Advanced feature engineering</li>
+                            <li>Neighborhood price trend analysis</li>
+                            <li>Investment ROI calculator</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-footer">
+                        <p>📧 Contact: amespredictor@example.com</p>
+                        <p>📅 Version: 2.0 | Last Updated: April 2026</p>
+                        <p>🎓 Academic Project | Data Source: Ames Housing Dataset (2006-2010)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <footer>
-            <p>Ames House Price Predictor | Ridge Regression | 2D & 3D Analytics Dashboard</p>
+            <p>Ames House Price Predictor | Ridge Regression | Smart Real Estate Analytics</p>
         </footer>
     </div>
 
-    <script src="script.js"></script>
     <!-- Feedback Modal -->
     <div id="feedbackModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal" onclick="closeFeedbackModal()">&times;</span>
             <h3>📝 Provide Feedback</h3>
             <p>Did you actually sell this house? Help us improve our model!</p>
-
             <div class="form-group">
                 <label>Actual Sale Price ($):</label>
                 <input type="number" id="actualPrice" placeholder="Enter actual sale price">
             </div>
-
             <div class="form-group">
                 <label>Rate your experience:</label>
                 <div class="rating-stars">
@@ -494,11 +733,12 @@
                     <span class="star" data-rating="5">★</span>
                 </div>
             </div>
-
             <button class="btn-submit-feedback" onclick="submitFeedback()">Submit Feedback</button>
             <p class="feedback-note">Your feedback will help us improve prediction accuracy!</p>
         </div>
     </div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>
