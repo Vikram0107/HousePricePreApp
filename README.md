@@ -4,5 +4,5 @@ python .\app.py
 
 for Front-end
 cd .\frontend
-python -m http.server 5000
-then run this in browser : http://localhost:5000
+python -m http.server 5500
+then run this in browser : http://localhost:5500
